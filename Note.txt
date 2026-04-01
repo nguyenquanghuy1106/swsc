@@ -1,0 +1,12 @@
+model sử dung để làm đồ án chuyên ngành MobileNetV2 dung kỷ thuật Transfer Learrning train 9733 val 1216 test 1218 
+train loss mức ôộ sai trên tập train càng nhỏ cảng tốt 
+val loss là mức độ sai của model trên tập validation càng nhỏ càng tốt
+
+train acc là độ chính xác trên tập train càng cao càng tốt 
+val acc là độ chính xác của model trên tập validation càng cao càng tốt 
+torch
+torchvision
+streamlit
+pillow
+scikit-learn
+matplotlib
