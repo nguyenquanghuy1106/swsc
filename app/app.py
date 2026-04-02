@@ -8,6 +8,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.models_utils import predict_image
+# import các hàm xử lý ảnh và dự đoán từ thư mục src
 
 
 st.set_page_config(page_title="Phân loại rác bằng AI", page_icon="♻️")

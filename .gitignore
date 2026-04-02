@@ -1,5 +1,14 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
 .env
 .ipynb_checkpoints/
+node_modules/
+*.pt
+*.pth
+*.h5
+*.pb
+*.pkl
+*.joblib
+dataset/
