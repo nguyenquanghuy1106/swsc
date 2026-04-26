@@ -1,0 +1,4 @@
+[server]
+fileWatcherType = "polling"
+[server]
+fileWatcherType = "none"
