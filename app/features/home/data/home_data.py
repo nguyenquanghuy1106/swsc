@@ -1,21 +1,101 @@
-def get_home_data():
+def get_home_categories():
+    return [
+        {
+            "code": "plastic",
+            "title": "Nhựa",
+            "years": "450~500 năm",
+            "bar_class": "bar-green",
+            "image": "assets/home/category_plastic.png",
+            "href": "?page=plastic",
+            "description": (
+                "Chai nhựa, hộp nhựa, lọ nhựa và các vật dụng nhựa "
+                "cần được phân loại riêng để tái chế hiệu quả."
+            ),
+        },
+        {
+            "code": "nylon",
+            "title": "Ni Lông",
+            "years": "~1000 năm",
+            "bar_class": "bar-pink",
+            "image": "assets/home/category_bag.png",
+            "href": "?page=nylon",
+            "description": (
+                "Túi ni lông rất khó phân hủy trong tự nhiên, "
+                "gây ảnh hưởng lớn đến đất, nước và sinh vật."
+            ),
+        },
+        {
+            "code": "battery",
+            "title": "Pin",
+            "years": "400~1000 năm",
+            "bar_class": "bar-orange",
+            "image": "assets/home/category_battery.png",
+            "href": "?page=battery",
+            "description": (
+                "Pin cũ chứa kim loại nặng và hóa chất độc hại, "
+                "không được bỏ chung với rác sinh hoạt."
+            ),
+        },
+        {
+            "code": "medical",
+            "title": "Y tế",
+            "years": "250~1000 năm",
+            "bar_class": "bar-red",
+            "image": "assets/home/category_medical.png",
+            "href": "?page=medical",
+            "description": (
+                "Rác y tế như khẩu trang, chai lọ thuốc, vật dụng nhiễm bẩn "
+                "cần xử lý theo quy trình riêng để bảo đảm an toàn."
+            ),
+        },
+    ]
+
+
+def get_home_environment_messages():
+    return [
+        "Vì một Trái Đất xanh sạch đẹp",
+        "Khuyến khích phân loại và tái chế",
+        "Giảm thiểu rác thải ô nhiễm",
+        "Chung tay vì thế hệ tương lai",
+    ]
+
+
+def get_home_benefits():
+    return [
+        "Tiết kiệm tài nguyên thiên nhiên",
+        "Giảm thiểu ô nhiễm môi trường",
+        "Tái chế, giảm tải bãi chôn lấp",
+        "Tránh nguy hại từ rác độc hại",
+    ]
+
+
+def get_home_footer_info():
     return {
-        "user_name": "Healing",
-        "points": 180,
-        "hero_title_line_1": "Phân loại hôm",
-        "hero_title_line_2": "nay, Xanh mãi",
-        "hero_title_line_3": "ngày mai",
-        "hero_subtitle": "Phân loại rác – thói quen của người văn minh",
-        "categories": [
-            {"name": "Nhựa", "image": "assets/images/category_plastic.png", "bg": "#F5F1B8"},
-            {"name": "Ni Lông", "image": "assets/images/category_bag.png", "bg": "#C9F3FF"},
-            {"name": "Pin", "image": "assets/images/category_battery.png", "bg": "#FFD1D8"},
-            {"name": "Y tế", "image": "assets/images/category_medical.png", "bg": "#DDF7D8"},
+        "title": "SWCS – Hệ Thống Phân Loại Rác Thải Thông Minh",
+        "subtitle": "Hỗ trợ nâng cao nhận thức và phân loại rác đúng cách.",
+        "copyright": "© 2024 SWCS. Tất cả quyền được bảo lưu.",
+        "links": [
+            "Điều khoản",
+            "Liên hệ 2024",
+            "Điều khoản sử dụng",
         ],
-        "hero_images": [
-            "assets/images/hero_1.jpg",
-            "assets/images/hero_2.jpg",
-            "assets/images/hero_3.jpg",
-        ],
-        "banner_image": "assets/images/banner_env.jpg"
+    }
+
+
+def get_home_hero_data():
+    return {
+        "title_line_1": "Phân loại hôm nay,",
+        "title_line_2": "Xanh mãi ngày mai",
+        "subtitle": "Phân loại rác – thói quen của người văn minh",
+        "button_text": "Bắt đầu hành trình",
+        "button_href": "?page=plastic",
+        "image": "assets/home/hero_1.jpg",
+    }
+
+
+def get_home_banner_images():
+    return {
+        "left_info_bg": "assets/home/hero_3.jpg",
+        "right_info_bg": "assets/home/hero_2.jpg",
+        "avatar": "assets/home/d5fbee7c-1737-4522-9147-fe934f39454b.png",
     }
