@@ -16,6 +16,7 @@ from features.home.UI.medical_view import render_medical_page
 
 
 BASE_DIR = Path(__file__).resolve().parent
+
 LOGIN_FILE = BASE_DIR / "features" / "Login&Register" / "Login.py"
 REGISTER_FILE = BASE_DIR / "features" / "Login&Register" / "Register.py"
 
@@ -77,25 +78,27 @@ def load_page_styles(page):
 
 
 def render_page(page):
-    if page not in ["login", "register"]:
-        if not st.session_state.get("is_login", False):
-            st.query_params["page"] = "login"
-            st.rerun()
-
     if page == "login":
         render_login_page()
+
     elif page == "register":
         render_register_page()
+
     elif page == "home":
         render_home_page()
+
     elif page == "plastic":
         render_plastic_page()
+
     elif page == "battery":
         render_battery_page()
+
     elif page == "nylon":
         render_nylon_page()
+
     elif page == "medical":
         render_medical_page()
+
     else:
         render_login_page()
 
