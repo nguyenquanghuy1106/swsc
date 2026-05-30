@@ -1,4 +1,8 @@
 [server]
+runOnSave = true
 fileWatcherType = "polling"
-[server]
-fileWatcherType = "none"
+headless = true
+port = 8501
+
+[browser]
+gatherUsageStats = false

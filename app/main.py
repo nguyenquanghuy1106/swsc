@@ -23,6 +23,20 @@ from features.home.UI.nylon_view import render_nylon_page
 from features.home.UI.medical_view import render_medical_page
 
 
+VALID_PAGES = {
+    "login",
+    "register",
+    "community",
+    "setting_user",
+    "homepage_user",
+    "home",
+    "plastic",
+    "battery",
+    "nylon",
+    "medical",
+}
+
+
 def configure_app():
     st.set_page_config(
         page_title="SWCS - Trang chủ",
@@ -33,9 +47,14 @@ def configure_app():
 
 
 def get_current_page() -> str:
-    current_page = st.query_params.get("page", "homepage_user")
+    current_page = st.query_params.get("page", "home")
+
     if isinstance(current_page, list):
         current_page = current_page[0]
+
+    if current_page not in VALID_PAGES:
+        current_page = "home"
+
     return current_page
 
 
@@ -61,7 +80,7 @@ def load_page_styles(page: str):
     elif page == "medical":
         load_medical_css()
     else:
-        load_login_css()
+        load_home_css()
 
 
 def render_page(page: str):
@@ -86,7 +105,7 @@ def render_page(page: str):
     elif page == "medical":
         render_medical_page()
     else:
-        render_login_page()
+        render_home_page()
 
 
 def run_app():
