@@ -66,7 +66,7 @@ def _render_search_block(vm: dict):
 
     st.markdown('<div class="swcs-home-user-search-card"><div class="swcs-home-user-search-inner">', unsafe_allow_html=True)
     keyword = st.text_input(
-        "",
+        "Tìm kiếm bài viết",
         placeholder=vm["branding"]["search_placeholder"],
         label_visibility="collapsed",
         key="homepage_user_search_keyword",

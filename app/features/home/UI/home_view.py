@@ -1,15 +1,18 @@
 import base64
 from pathlib import Path
 from textwrap import dedent
-
+import streamlit.components.v1 as components
 import streamlit as st
 from features.home.logic.home_service import get_home_data
 
 
 def load_home_view_model():
     data = get_home_data()
+
     return {
-        "page_title": "SWCS – Hệ Thống Phân Loại Rác Thải Thông Minh",
+        "page_title": "SWCS",
+        "user_name": "Healing",
+        "points": "180 Point",
         "hero": data["hero"],
         "categories": data["categories"],
         "environment_messages": data["environment_messages"],
@@ -20,6 +23,9 @@ def load_home_view_model():
 
 
 def _image_to_base64(image_path: str) -> str:
+    if not image_path:
+        return ""
+
     base_dir = Path(__file__).resolve().parents[4]
     path = base_dir / image_path
 
@@ -33,7 +39,9 @@ def _image_to_base64(image_path: str) -> str:
         ".jpg": "image/jpeg",
         ".jpeg": "image/jpeg",
         ".webp": "image/webp",
+        ".svg": "image/svg+xml",
     }
+
     mime_type = mime_map.get(suffix, "image/png")
 
     with open(path, "rb") as f:
@@ -42,202 +50,247 @@ def _image_to_base64(image_path: str) -> str:
     return f"data:{mime_type};base64,{encoded}"
 
 
-def _render_sidebar():
-    sidebar_html = (
-        '<div class="swcs-sidebar-wrapper">'
-        '  <input type="checkbox" id="swcsSidebarToggle" class="swcs-sidebar-checkbox">'
-        '  <label for="swcsSidebarToggle" class="swcs-sidebar-toggle">☰</label>'
-        '  <label for="swcsSidebarToggle" class="swcs-sidebar-overlay"></label>'
+def _safe_image(path: str, css_class: str, alt: str = "") -> str:
+    src = _image_to_base64(path)
 
-        '  <div class="swcs-sidebar">'
-        '    <div class="swcs-logo-wrap">'
-        '      <div class="swcs-logo-icon">♻</div>'
-        '      <div class="swcs-logo-text">SWCS</div>'
-        '    </div>'
+    if src:
+        return f'<img src="{src}" class="{css_class}" alt="{alt}">'
 
-        '    <div class="swcs-menu">'
-        '      <a class="swcs-menu-item" href="?page=home">'
-        '        <span>⦿</span>'
-        '        <span>Tổng quan</span>'
-        '      </a>'
-
-        '      <a class="swcs-menu-item active" href="?page=home">'
-        '        <span>🗂</span>'
-        '        <span>Phân loại rác</span>'
-        '      </a>'
-
-        '      <a class="swcs-menu-item" href="?page=detect">'
-        '        <span>⌲</span>'
-        '        <span>Nhận diện rác</span>'
-        '      </a>'
-
-        '      <a class="swcs-menu-item" href="?page=recycle">'
-        '        <span>⌘</span>'
-        '        <span>Kiến thức tái chế</span>'
-        '      </a>'
-
-        '      <a class="swcs-menu-item" href="?page=stats">'
-        '        <span>📈</span>'
-        '        <span>Thống kê</span>'
-        '      </a>'
-
-        '      <a class="swcs-menu-item" href="?page=settings">'
-        '        <span>⚙</span>'
-        '        <span>Cài đặt</span>'
-        '      </a>'
-        '    </div>'
-
-        '    <div class="swcs-sidebar-bottom">'
-        '      <div class="swcs-bottom-icon">♻</div>'
-        '      <div class="swcs-bottom-icon">👥</div>'
-        '      <div class="swcs-bottom-icon">⚙</div>'
-        '    </div>'
-        '  </div>'
-        '</div>'
-    )
-    st.markdown(sidebar_html, unsafe_allow_html=True)
+    return '<div class="swcs-img-fallback">♻</div>'
 
 
-def _render_topbar(vm: dict):
-    avatar_path = vm["images"]["avatar"]
-    avatar_src = _image_to_base64(avatar_path)
+def _category_icon_by_title(title: str) -> str:
+    title_lower = title.lower()
+
+    if "nhựa" in title_lower:
+        return "🧴"
+    if "NiLong" in title_lower or "nỉ" in title_lower or "nylon" in title_lower or "lông" in title_lower:
+        return "🛍️"
+    if "pin" in title_lower:
+        return "🔋"
+    if "y tế" in title_lower or "medical" in title_lower:
+        return "💉"
+
+    return "♻️"
+
+
+def _category_color_class(index: int) -> str:
+    colors = ["yellow", "blue", "pink", "green"]
+    return colors[index % len(colors)]
+
+
+def _render_categories(categories: list[dict]) -> str:
+    html = ""
+
+    for index, item in enumerate(categories[:4]):
+        title = item.get("title", "Loại rác")
+        href = item.get("href", "#")
+        icon = item.get("icon", "") or _category_icon_by_title(title)
+        color_class = _category_color_class(index)
+
+        html += f"""
+        <a href="{href}" class="swcs-web-category">
+            <div class="swcs-category-circle {color_class}">
+                <span>{icon}</span>
+            </div>
+            <div class="swcs-web-category-name">{title}</div>
+        </a>
+        """
+
+    return html
+
+
+def _render_bottom_nav() -> str:
+    return """
+    <div class="swcs-bottom-nav">
+        <a class="swcs-nav-item active" href="?page=home">
+            <span class="swcs-nav-icon">⌂</span>
+            <span class="swcs-nav-label">Trang chủ</span>
+        </a>
+
+        <a class="swcs-nav-item" href="?page=explore">
+            <span class="swcs-nav-icon">⌾</span>
+            <span class="swcs-nav-label">Khám phá</span>
+        </a>
+
+        <a class="swcs-scan-btn" href="?page=scan" title="Quét camera">
+            <span class="swcs-scan-corner tl"></span>
+            <span class="swcs-scan-corner tr"></span>
+            <span class="swcs-scan-corner bl"></span>
+            <span class="swcs-scan-corner br"></span>
+            <span class="swcs-scan-dot"></span>
+        </a>
+
+        <a class="swcs-nav-item" href="?page=store">
+            <span class="swcs-nav-icon">♧</span>
+            <span class="swcs-nav-label">Đổi quà</span>
+        </a>
+
+        <a class="swcs-nav-item" href="?page=profile">
+            <span class="swcs-nav-icon">●</span>
+            <span class="swcs-nav-label">Cá nhân</span>
+        </a>
+    </div>
+    """
+
+
+def _render_home_html(vm: dict) -> str:
+    avatar_src = _image_to_base64(vm["images"].get("avatar", ""))
 
     avatar_html = (
-        f'<img src="{avatar_src}" class="swcs-avatar-img" alt="avatar">'
+        f'<img src="{avatar_src}" class="swcs-user-avatar" alt="avatar">'
         if avatar_src
-        else '<div class="swcs-avatar-fallback">👤</div>'
+        else '<div class="swcs-user-avatar fallback">♻</div>'
     )
 
-    topbar_html = (
-        '<div class="swcs-topbar">'
-        f'  <div class="swcs-topbar-title">{vm["page_title"]}</div>'
-        '  <div class="swcs-topbar-right">'
-        '    <div class="swcs-search-box">'
-        '      <span class="swcs-search-icon">🔍</span>'
-        '      <span class="swcs-search-text">Tìm kiếm...</span>'
-        '    </div>'
-        '    <div class="swcs-noti-wrap">'
-        '      <div class="swcs-noti-badge">1</div>'
-        '      <div class="swcs-noti-icon">🔔</div>'
-        '    </div>'
-        f'    <div class="swcs-avatar-wrap">{avatar_html}</div>'
-        '  </div>'
-        '</div>'
-    )
-    st.markdown(topbar_html, unsafe_allow_html=True)
+    hero_img = _image_to_base64(vm["hero"].get("image", ""))
+    banner_bg = _image_to_base64(vm["images"].get("left_info_bg", "")) or hero_img
 
+    categories = vm.get("categories", [])
+    categories_html = _render_categories(categories)
 
-def _render_hero(hero: dict):
-    hero_src = _image_to_base64(hero["image"])
+    img_1 = categories[0].get("image", "") if len(categories) > 0 else vm["hero"].get("image", "")
+    img_2 = categories[1].get("image", "") if len(categories) > 1 else vm["hero"].get("image", "")
+    img_3 = categories[2].get("image", "") if len(categories) > 2 else vm["hero"].get("image", "")
 
-    hero_html = (
-        f'<div class="swcs-hero" style="background-image: url(\'{hero_src}\');">'
-        '  <div class="swcs-hero-overlay">'
-        '    <div class="swcs-hero-content">'
-        f'      <div class="swcs-hero-title">{hero["title_line_1"]}<br><span>{hero["title_line_2"]}</span></div>'
-        f'      <div class="swcs-hero-sub">{hero["subtitle"]}</div>'
-        f'      <a class="swcs-hero-btn" href="{hero["button_href"]}">{hero["button_text"]}</a>'
-        '    </div>'
-        '  </div>'
-        '</div>'
-    )
-    st.markdown(hero_html, unsafe_allow_html=True)
+    collage_1 = _safe_image(img_1, "swcs-collage-img", "collage")
+    collage_2 = _safe_image(img_2, "swcs-collage-img", "collage")
+    collage_3 = _safe_image(img_3, "swcs-collage-img", "collage")
 
-
-def _render_category_card(item: dict):
-    image_src = _image_to_base64(item["image"])
-
-    image_html = (
-        f'<img src="{image_src}" class="swcs-category-img" alt="{item["title"]}">'
-        if image_src
-        else '<div class="swcs-category-img-fallback">♻</div>'
+    hero_subtitle = vm["hero"].get(
+        "subtitle",
+        "Phân loại rác – thói quen của người văn minh"
     )
 
-    card_html = dedent(f"""
-    <a class="swcs-category-card" href="{item["href"]}">
-        <div class="swcs-category-image-wrap">{image_html}</div>
-        <div class="swcs-category-title">{item["title"]}</div>
-        <div class="swcs-category-bar">
-            <div class="swcs-category-bar-fill {item["bar_class"]}"></div>
-        </div>
-        <div class="swcs-category-years">{item["years"]}</div>
-    </a>
-    """).strip()
-    st.markdown(card_html, unsafe_allow_html=True)
+    hero_button_text = vm["hero"].get("button_text", "Bắt đầu hành trình")
+    hero_button_href = vm["hero"].get("button_href", "?page=plastic")
 
+    html = f"""
+    <div class="swcs-page-bg">
+        <section class="swcs-home-web-card">
 
-def _render_categories(categories: list[dict]):
-    st.markdown(
-        '<div class="swcs-section-title">Khám phá các loại rác ngay</div>',
-        unsafe_allow_html=True
-    )
+            <div class="swcs-home-top">
+                <a href="?page=menu" class="swcs-menu-btn">☰</a>
 
-    cols = st.columns(4, gap="medium")
-    for col, item in zip(cols, categories):
-        with col:
-            _render_category_card(item)
+                <div class="swcs-top-right">
+                    <a href="?page=notifications" class="swcs-bell">
+                        <span class="swcs-bell-dot"></span>
+                        🔔
+                    </a>
 
+                    <div class="swcs-point-pill">
+                        <span class="swcs-gift">🎁</span>
+                        <span>{vm["points"]}</span>
+                    </div>
+                </div>
+            </div>
 
-def _render_info_box(title: str, items: list[str], bg_path: str):
-    bg_src = _image_to_base64(bg_path)
-    items_html = "".join(f"<li>{item}</li>" for item in items)
+            <div class="swcs-user-row">
+                <div class="swcs-user-left">
+                    {avatar_html}
+                    <div>
+                        <div class="swcs-hi">Hi, <b>{vm["user_name"]}</b></div>
+                        <div class="swcs-user-sub">Cùng phân loại rác thông minh hôm nay</div>
+                    </div>
+                </div>
+            </div>
 
-    box_html = dedent(f"""
-    <div class="swcs-info-box" style="background-image: url('{bg_src}');">
-        <div class="swcs-info-overlay">
-            <div class="swcs-info-title">{title}</div>
-            <ul class="swcs-info-list">{items_html}</ul>
-        </div>
+            <div class="swcs-hero-web">
+                <div class="swcs-hero-text">
+                    <div class="swcs-hero-badge">Smart Waste Classification System</div>
+
+                    <h1>
+                        Phân loại hôm<br>
+                        nay, <span>Xanh mãi</span><br>
+                        ngày mai
+                    </h1>
+
+                    <p>{hero_subtitle}</p>
+
+                    <div class="swcs-hero-actions">
+                        <a href="{hero_button_href}" class="swcs-start-btn">{hero_button_text}</a>
+                        <a href="?page=scan" class="swcs-outline-btn">Quét bằng camera</a>
+                    </div>
+                </div>
+
+                <div class="swcs-hero-visual">
+                    <div class="swcs-blob one"></div>
+                    <div class="swcs-blob two"></div>
+                    <div class="swcs-blob three"></div>
+
+                    <div class="swcs-collage big">{collage_1}</div>
+                    <div class="swcs-collage small top">{collage_2}</div>
+                    <div class="swcs-collage small bottom">{collage_3}</div>
+                </div>
+            </div>
+
+            <div class="swcs-section-head">
+    <div class="swcs-section-title">Rác Cần Phân Loại</div>
+    <a href="?page=categories" class="swcs-section-link">Tất cả</a>
+</div>
+
+            <div class="swcs-category-grid">
+                {categories_html}
+            </div>
+
+            <a href="?page=about" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
+                <div class="swcs-banner-overlay">
+                    <div class="swcs-banner-brand">Healing</div>
+                    <div class="swcs-banner-title">Bảo vệ môi trường · Kiến tạo tương lai</div>
+                </div>
+            </a>
+
+            <div class="swcs-slider-dots">
+                <span class="active"></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="swcs-info-row">
+                <div class="swcs-info-card">
+                    <div class="swcs-info-icon">♻️</div>
+                    <div>
+                        <h3>Phân loại chính xác</h3>
+                        <p>Nhận biết từng nhóm rác và xử lý đúng cách.</p>
+                    </div>
+                </div>
+
+                <div class="swcs-info-card">
+                    <div class="swcs-info-icon">🌱</div>
+                    <div>
+                        <h3>Sống xanh mỗi ngày</h3>
+                        <p>Xây dựng thói quen bảo vệ môi trường bền vững.</p>
+                    </div>
+                </div>
+
+                <div class="swcs-info-card">
+                    <div class="swcs-info-icon">🎁</div>
+                    <div>
+                        <h3>Tích điểm đổi quà</h3>
+                        <p>Hoàn thành nhiệm vụ xanh để nhận điểm thưởng.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swcs-bottom-space"></div>
+
+            <a href="?page=recycle" class="swcs-floating-recycle">♻</a>
+
+            {_render_bottom_nav()}
+
+        </section>
     </div>
-    """).strip()
-    st.markdown(box_html, unsafe_allow_html=True)
+    """
 
-
-def _render_footer(footer: dict):
-    links_html = " <span>|</span> ".join(f"<span>{x}</span>" for x in footer["links"])
-
-    footer_html = dedent(f"""
-    <div class="swcs-footer">
-        <div class="swcs-footer-title">{footer["title"]}</div>
-        <div class="swcs-footer-sub">{footer["subtitle"]}</div>
-        <div class="swcs-footer-bottom">
-            <div>{footer["copyright"]}</div>
-            <div class="swcs-footer-links">{links_html}</div>
-        </div>
-    </div>
-    """).strip()
-    st.markdown(footer_html, unsafe_allow_html=True)
+    return dedent(html).strip()
 
 
 def render_home_page():
     vm = load_home_view_model()
 
-    _render_topbar(vm)
+    html = _render_home_html(vm)
 
-    left, right = st.columns([1.1, 4.4], gap="large")
-
-    with left:
-        _render_sidebar()
-
-    with right:
-        _render_hero(vm["hero"])
-        _render_categories(vm["categories"])
-
-        st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
-
-        c1, c2 = st.columns(2, gap="large")
-        with c1:
-            _render_info_box(
-                "Thông điệp môi trường",
-                vm["environment_messages"],
-                vm["images"]["left_info_bg"],
-            )
-        with c2:
-            _render_info_box(
-                "Lợi ích phân loại rác",
-                vm["benefits"],
-                vm["images"]["right_info_bg"],
-            )
-
-        st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
-        _render_footer(vm["footer"])
+    if hasattr(st, "html"):
+        st.html(html)
+    else:
+        st.components.v1.html(html, height=1200, scrolling=True)
