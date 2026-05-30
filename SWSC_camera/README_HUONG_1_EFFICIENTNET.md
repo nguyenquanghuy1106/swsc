@@ -49,7 +49,7 @@ File `waste_efficientnet.keras` là model tốt nhất theo `val_accuracy`.
 ## 4. Quét camera realtime
 
 ```bash
-python src/camera_predict.py
+# python SWSC_camera/src/camera_predict.py
 ```
 
 Phím sử dụng:

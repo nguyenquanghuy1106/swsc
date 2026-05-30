@@ -1,8 +1,8 @@
 import base64
 from pathlib import Path
 from textwrap import dedent
-import streamlit.components.v1 as components
 import streamlit as st
+
 from features.home.logic.home_service import get_home_data
 
 
@@ -62,12 +62,20 @@ def _safe_image(path: str, css_class: str, alt: str = "") -> str:
 def _category_icon_by_title(title: str) -> str:
     title_lower = title.lower()
 
-    if "nhựa" in title_lower:
+    if "nhựa" in title_lower or "plastic" in title_lower:
         return "🧴"
-    if "NiLong" in title_lower or "nỉ" in title_lower or "nylon" in title_lower or "lông" in title_lower:
+
+    if (
+        "nilong" in title_lower
+        or "ni lông" in title_lower
+        or "nylon" in title_lower
+        or "lông" in title_lower
+    ):
         return "🛍️"
-    if "pin" in title_lower:
+
+    if "pin" in title_lower or "battery" in title_lower:
         return "🔋"
+
     if "y tế" in title_lower or "medical" in title_lower:
         return "💉"
 
@@ -79,17 +87,42 @@ def _category_color_class(index: int) -> str:
     return colors[index % len(colors)]
 
 
+def _get_category_page(title: str) -> str:
+    title_lower = title.lower()
+
+    if "nhựa" in title_lower or "plastic" in title_lower:
+        return "plastic"
+
+    if (
+        "nilong" in title_lower
+        or "ni lông" in title_lower
+        or "nylon" in title_lower
+        or "lông" in title_lower
+    ):
+        return "nylon"
+
+    if "pin" in title_lower or "battery" in title_lower:
+        return "battery"
+
+    if "y tế" in title_lower or "medical" in title_lower:
+        return "medical"
+
+    return "home"
+
+
 def _render_categories(categories: list[dict]) -> str:
     html = ""
 
     for index, item in enumerate(categories[:4]):
         title = item.get("title", "Loại rác")
-        href = item.get("href", "#")
+        page = _get_category_page(title)
+        href = f"?page={page}"
+
         icon = item.get("icon", "") or _category_icon_by_title(title)
         color_class = _category_color_class(index)
 
         html += f"""
-        <a href="{href}" class="swcs-web-category">
+        <a href="{href}" target="_top" class="swcs-web-category">
             <div class="swcs-category-circle {color_class}">
                 <span>{icon}</span>
             </div>
@@ -103,17 +136,17 @@ def _render_categories(categories: list[dict]) -> str:
 def _render_bottom_nav() -> str:
     return """
     <div class="swcs-bottom-nav">
-        <a class="swcs-nav-item active" href="?page=home">
+        <a class="swcs-nav-item active" href="?page=home" target="_top">
             <span class="swcs-nav-icon">⌂</span>
             <span class="swcs-nav-label">Trang chủ</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=explore">
-            <span class="swcs-nav-icon">⌾</span>
-            <span class="swcs-nav-label">Khám phá</span>
+        <a class="swcs-nav-item" href="?page=plastic" target="_top">
+            <span class="swcs-nav-icon">♻</span>
+            <span class="swcs-nav-label">Nhựa</span>
         </a>
 
-        <a class="swcs-scan-btn" href="?page=scan" title="Quét camera">
+        <a class="swcs-scan-btn" href="?page=scan" target="_top" title="Quét camera">
             <span class="swcs-scan-corner tl"></span>
             <span class="swcs-scan-corner tr"></span>
             <span class="swcs-scan-corner bl"></span>
@@ -121,14 +154,14 @@ def _render_bottom_nav() -> str:
             <span class="swcs-scan-dot"></span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=store">
-            <span class="swcs-nav-icon">♧</span>
-            <span class="swcs-nav-label">Đổi quà</span>
+        <a class="swcs-nav-item" href="?page=battery" target="_top">
+            <span class="swcs-nav-icon">🔋</span>
+            <span class="swcs-nav-label">Pin</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=profile">
-            <span class="swcs-nav-icon">●</span>
-            <span class="swcs-nav-label">Cá nhân</span>
+        <a class="swcs-nav-item" href="?page=medical" target="_top">
+            <span class="swcs-nav-icon">💉</span>
+            <span class="swcs-nav-label">Y tế</span>
         </a>
     </div>
     """
@@ -163,17 +196,16 @@ def _render_home_html(vm: dict) -> str:
     )
 
     hero_button_text = vm["hero"].get("button_text", "Bắt đầu hành trình")
-    hero_button_href = vm["hero"].get("button_href", "?page=plastic")
 
     html = f"""
     <div class="swcs-page-bg">
         <section class="swcs-home-web-card">
 
             <div class="swcs-home-top">
-                <a href="?page=menu" class="swcs-menu-btn">☰</a>
+                <a href="?page=home" target="_top" class="swcs-menu-btn">☰</a>
 
                 <div class="swcs-top-right">
-                    <a href="?page=notifications" class="swcs-bell">
+                    <a href="?page=home" target="_top" class="swcs-bell">
                         <span class="swcs-bell-dot"></span>
                         🔔
                     </a>
@@ -208,8 +240,8 @@ def _render_home_html(vm: dict) -> str:
                     <p>{hero_subtitle}</p>
 
                     <div class="swcs-hero-actions">
-                        <a href="{hero_button_href}" class="swcs-start-btn">{hero_button_text}</a>
-                        <a href="?page=scan" class="swcs-outline-btn">Quét bằng camera</a>
+                        <a href="?page=plastic" target="_top" class="swcs-start-btn">{hero_button_text}</a>
+                        <a href="?page=home" target="_top" class="swcs-outline-btn">Quét bằng camera</a>
                     </div>
                 </div>
 
@@ -225,15 +257,15 @@ def _render_home_html(vm: dict) -> str:
             </div>
 
             <div class="swcs-section-head">
-    <div class="swcs-section-title">Rác Cần Phân Loại</div>
-    <a href="?page=categories" class="swcs-section-link">Tất cả</a>
-</div>
+                <div class="swcs-section-title">Rác Cần Phân Loại</div>
+                <a href="?page=plastic" target="_top" class="swcs-section-link">Tất cả</a>
+            </div>
 
             <div class="swcs-category-grid">
                 {categories_html}
             </div>
 
-            <a href="?page=about" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
+            <a href="?page=home" target="_top" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
                 <div class="swcs-banner-overlay">
                     <div class="swcs-banner-brand">Healing</div>
                     <div class="swcs-banner-title">Bảo vệ môi trường · Kiến tạo tương lai</div>
@@ -274,10 +306,9 @@ def _render_home_html(vm: dict) -> str:
 
             <div class="swcs-bottom-space"></div>
 
-            <a href="?page=recycle" class="swcs-floating-recycle">♻</a>
+            <a href="?page=home" target="_top" class="swcs-floating-recycle">♻</a>
 
             {_render_bottom_nav()}
-
         </section>
     </div>
     """
@@ -287,7 +318,6 @@ def _render_home_html(vm: dict) -> str:
 
 def render_home_page():
     vm = load_home_view_model()
-
     html = _render_home_html(vm)
 
     if hasattr(st, "html"):
