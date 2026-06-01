@@ -17,13 +17,20 @@ CLASS_NAMES = [
     "trash",
 ]
 
-ALLOWED_CLASSES = {
-    "plastic": "Nhựa",
-    "paper": "Giấy",
+
+DISPLAY_NAMES = {
+    "battery": "Pin",
+    "biological": "Rác hữu cơ",
     "cardboard": "Bìa carton",
+    "clothes": "Quần áo",
     "glass": "Thủy tinh",
     "metal": "Kim loại",
+    "paper": "Giấy",
+    "plastic": "Nhựa",
+    "shoes": "Giày dép",
+    "trash": "Rác khác",
 }
+
 
 _MODEL = None
 
@@ -58,6 +65,7 @@ def _get_model():
     _MODEL = model
     return _MODEL
 
+
 def predict_waste_image(image: Image.Image):
     if image.mode != "RGB":
         image = image.convert("RGB")
@@ -72,35 +80,18 @@ def predict_waste_image(image: Image.Image):
     confidence, predicted_idx = torch.max(probabilities, dim=0)
 
     predicted_class = CLASS_NAMES[predicted_idx.item()]
-    confidence_score = confidence.item() * 100
+    confidence_score = round(confidence.item() * 100, 2)
 
     all_probabilities = {
         CLASS_NAMES[i]: round(probabilities[i].item() * 100, 2)
         for i in range(len(CLASS_NAMES))
     }
 
-    allowed_probabilities = {
-        ALLOWED_CLASSES[name]: all_probabilities[name]
-        for name in ALLOWED_CLASSES
-    }
-
-    if predicted_class not in ALLOWED_CLASSES:
-        return {
-            "success": False,
-            "message": (
-                f"Ảnh này được AI dự đoán là '{predicted_class}', "
-                "không thuộc 5 nhóm được phép: nhựa, giấy, carton, thủy tinh, kim loại."
-            ),
-            "predicted_class": predicted_class,
-            "confidence": round(confidence_score, 2),
-            "allowed_probabilities": allowed_probabilities,
-        }
-
     return {
         "success": True,
         "message": "Nhận diện thành công.",
         "predicted_class": predicted_class,
-        "display_name": ALLOWED_CLASSES[predicted_class],
-        "confidence": round(confidence_score, 2),
-        "allowed_probabilities": allowed_probabilities,
+        "display_name": DISPLAY_NAMES.get(predicted_class, predicted_class),
+        "confidence": confidence_score,
+        "all_probabilities": all_probabilities,
     }

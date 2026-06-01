@@ -48,7 +48,7 @@ def register_user(user_name, phone, password):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT id FROM Register WHERE userName = %s OR phone = %s",
+        "SELECT id FROM register WHERE userName = %s OR phone = %s",
         (user_name, phone)
     )
 
@@ -60,7 +60,7 @@ def register_user(user_name, phone, password):
         return False, "Tên người dùng hoặc số điện thoại đã tồn tại"
 
     cursor.execute(
-        "INSERT INTO Register (userName, phone, password) VALUES (%s, %s, %s)",
+        "INSERT INTO register (userName, phone, password) VALUES (%s, %s, %s)",
         (user_name, phone, password)
     )
 
