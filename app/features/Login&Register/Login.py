@@ -65,6 +65,27 @@ def login_user(user_name, password):
     return user
 
 
+def save_current_login(user_id, user_name):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            REPLACE INTO current_login (id, user_id, userName, updated_at)
+            VALUES (1, %s, %s, NOW())
+            """,
+            (user_id, user_name),
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception:
+        pass
+
+
 def set_login_session(user):
     user_id = int(user["id"])
     user_name = str(user["userName"])
@@ -72,6 +93,8 @@ def set_login_session(user):
     st.session_state["is_login"] = True
     st.session_state["user_id"] = user_id
     st.session_state["user_name"] = user_name
+
+    save_current_login(user_id, user_name)
 
     st.query_params["page"] = "home"
     st.query_params["uid"] = str(user_id)
@@ -99,7 +122,7 @@ def render_login_page():
                     </p>
                 </div>
                 """,
-                unsafe_allow_html=True,
+unsafe_allow_html=True,
             )
 
         with right:
