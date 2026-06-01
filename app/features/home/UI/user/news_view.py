@@ -1,7 +1,7 @@
 import base64
 from pathlib import Path
 import streamlit as st
-
+from urllib.parse import quote
 from features.home.data.user.post_composer_data import get_right_sidebar_data
 from features.home.logic.user.news_service import (
     get_all_posted_news,
@@ -15,14 +15,21 @@ from shared.styles.news_css import load_news_css
 def _render_bottom_nav() -> str:
     return (
         '<div class="swcs-bottom-nav">'
-        '<a class="swcs-nav-item" href="?page=home" target="_top"><span class="swcs-nav-icon">🏠</span><span class="swcs-nav-label">Trang chủ</span></a>'
-        '<a class="swcs-nav-item" href="?page=post" target="_top"><span class="swcs-nav-icon">📚</span><span class="swcs-nav-label">Bài đăng</span></a>'
-        '<a class="swcs-scan-btn" href="?page=ai" target="_top" title="AI nhận diện"><span class="swcs-nav-ai">🤖</span></a>'
-        '<a class="swcs-nav-item active" href="?page=news" target="_top"><span class="swcs-nav-icon">📰</span><span class="swcs-nav-label">Tin tức</span></a>'
-        '<a class="swcs-nav-item" href="?page=profile" target="_top"><span class="swcs-nav-icon">👤</span><span class="swcs-nav-label">Profile</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("home")}" target="_top"><span class="swcs-nav-icon">🏠</span><span class="swcs-nav-label">Trang chủ</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("post")}" target="_top"><span class="swcs-nav-icon">📚</span><span class="swcs-nav-label">Bài đăng</span></a>'
+        f'<a class="swcs-scan-btn" href="{_page_url("ai")}" target="_top" title="AI nhận diện"><span class="swcs-nav-ai">🤖</span></a>'
+        f'<a class="swcs-nav-item active" href="{_page_url("news")}" target="_top"><span class="swcs-nav-icon">📰</span><span class="swcs-nav-label">Tin tức</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("medical")}" target="_top"><span class="swcs-nav-icon">👤</span><span class="swcs-nav-label">Profile</span></a>'
         "</div>"
     )
+def _page_url(page):
+    user_id = st.session_state.get("user_id")
+    user_name = st.session_state.get("user_name")
 
+    if user_id and user_name:
+        return f"?page={page}&uid={user_id}&uname={quote(str(user_name))}"
+
+    return f"?page={page}"
 
 def _get_user_id():
     return st.session_state.get("user_id")

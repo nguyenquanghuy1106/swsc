@@ -98,9 +98,7 @@ def set_login_session(user):
 
     st.query_params["page"] = "home"
     st.query_params["uid"] = str(user_id)
-    st.query_params["uname"] = quote(user_name)
-
-
+    st.query_params["uname"] = user_name
 def render_login_page():
     load_auth_style()
 

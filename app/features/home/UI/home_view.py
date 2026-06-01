@@ -151,29 +151,29 @@ def _render_categories(categories):
 
 
 def _render_bottom_nav() -> str:
-    return """
+    return f"""
     <div class="swcs-bottom-nav">
 
-        <a class="swcs-nav-item active" href="?page=home" target="_top">
+        <a class="swcs-nav-item active" href="{_page_link("home")}" target="_top">
             <span class="swcs-nav-icon">🏠</span>
             <span class="swcs-nav-label">Trang chủ</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=post" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("post")}" target="_top">
             <span class="swcs-nav-icon">📚</span>
             <span class="swcs-nav-label">Bài đăng</span>
         </a>
 
-        <a class="swcs-scan-btn" href="?page=ai" target="_top" title="Quét camera">
+        <a class="swcs-scan-btn" href="{_page_link("ai")}" target="_top" title="Quét camera">
             <span class="swcs-nav-ai">🤖</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=battery" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("news")}" target="_top">
             <span class="swcs-nav-icon">📰</span>
             <span class="swcs-nav-label">Tin tức</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=medical" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("medical")}" target="_top">
             <span class="swcs-nav-icon">👤</span>
             <span class="swcs-nav-label">Profile</span>
         </a>
