@@ -2,51 +2,39 @@ def get_home_categories():
     return [
         {
             "code": "plastic",
-            "title": "Nhựa",
+            "title": "Tái Chế",
             "years": "450~500 năm",
             "bar_class": "bar-green",
             "image": "assets/home/category_plastic.png",
             "href": "?page=plastic",
-            "description": (
-                "Chai nhựa, hộp nhựa, lọ nhựa và các vật dụng nhựa "
-                "cần được phân loại riêng để tái chế hiệu quả."
-            ),
+            "description": "Chai nhựa, hộp nhựa, lọ nhựa và các vật dụng nhựa cần được phân loại riêng để tái chế hiệu quả.",
         },
         {
             "code": "nylon",
-            "title": "Ni Lông",
+            "title": "Hữu Cơ",
             "years": "~1000 năm",
             "bar_class": "bar-pink",
             "image": "assets/home/category_bag.png",
             "href": "?page=nylon",
-            "description": (
-                "Túi ni lông rất khó phân hủy trong tự nhiên, "
-                "gây ảnh hưởng lớn đến đất, nước và sinh vật."
-            ),
+            "description": "Túi ni lông rất khó phân hủy trong tự nhiên, gây ảnh hưởng lớn đến đất, nước và sinh vật.",
         },
         {
             "code": "battery",
-            "title": "Pin",
+            "title": "Nguy Hại",
             "years": "400~1000 năm",
             "bar_class": "bar-orange",
             "image": "assets/home/category_battery.png",
             "href": "?page=battery",
-            "description": (
-                "Pin cũ chứa kim loại nặng và hóa chất độc hại, "
-                "không được bỏ chung với rác sinh hoạt."
-            ),
+            "description": "Pin cũ chứa kim loại nặng và hóa chất độc hại, không được bỏ chung với rác sinh hoạt.",
         },
         {
             "code": "medical",
-            "title": "Y tế",
+            "title": "Khác",
             "years": "250~1000 năm",
             "bar_class": "bar-red",
             "image": "assets/home/category_medical.png",
             "href": "?page=medical",
-            "description": (
-                "Rác y tế như khẩu trang, chai lọ thuốc, vật dụng nhiễm bẩn "
-                "cần xử lý theo quy trình riêng để bảo đảm an toàn."
-            ),
+            "description": "Rác y tế như khẩu trang, chai lọ thuốc, vật dụng nhiễm bẩn cần xử lý theo quy trình riêng để bảo đảm an toàn.",
         },
     ]
 

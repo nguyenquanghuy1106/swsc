@@ -59,25 +59,20 @@ def _safe_image(path: str, css_class: str, alt: str = "") -> str:
     return '<div class="swcs-img-fallback">♻</div>'
 
 
-def _category_icon_by_title(title: str) -> str:
-    title_lower = title.lower()
+def _category_icon_by_code(code: str) -> str:
+    code = str(code).lower().strip()
 
-    if "nhựa" in title_lower or "plastic" in title_lower:
-        return "🧴"
+    if code == "plastic":
+        return "♻️"
 
-    if (
-        "nilong" in title_lower
-        or "ni lông" in title_lower
-        or "nylon" in title_lower
-        or "lông" in title_lower
-    ):
-        return "🛍️"
+    if code == "nylon":
+        return "🍃"
 
-    if "pin" in title_lower or "battery" in title_lower:
-        return "🔋"
+    if code == "battery":
+        return "☣️"
 
-    if "y tế" in title_lower or "medical" in title_lower:
-        return "💉"
+    if code == "medical":
+        return "🗑️"
 
     return "♻️"
 
@@ -87,38 +82,15 @@ def _category_color_class(index: int) -> str:
     return colors[index % len(colors)]
 
 
-def _get_category_page(title: str) -> str:
-    title_lower = title.lower()
-
-    if "nhựa" in title_lower or "plastic" in title_lower:
-        return "plastic"
-
-    if (
-        "nilong" in title_lower
-        or "ni lông" in title_lower
-        or "nylon" in title_lower
-        or "lông" in title_lower
-    ):
-        return "nylon"
-
-    if "pin" in title_lower or "battery" in title_lower:
-        return "battery"
-
-    if "y tế" in title_lower or "medical" in title_lower:
-        return "medical"
-
-    return "home"
-
-
 def _render_categories(categories: list[dict]) -> str:
     html = ""
 
     for index, item in enumerate(categories[:4]):
         title = item.get("title", "Loại rác")
-        page = _get_category_page(title)
-        href = f"?page={page}"
+        href = item.get("href", "?page=home")
+        code = item.get("code", "")
 
-        icon = item.get("icon", "") or _category_icon_by_title(title)
+        icon = item.get("icon", "") or _category_icon_by_code(code)
         color_class = _category_color_class(index)
 
         html += f"""
@@ -142,11 +114,11 @@ def _render_bottom_nav() -> str:
         </a>
 
         <a class="swcs-nav-item" href="?page=plastic" target="_top">
-            <span class="swcs-nav-icon">♻</span>
-            <span class="swcs-nav-label">Nhựa</span>
+            <span class="swcs-nav-icon">♻️</span>
+            <span class="swcs-nav-label">Tái Chế</span>
         </a>
 
-        <a class="swcs-scan-btn" href="?page=scan" target="_top" title="Quét camera">
+        <a class="swcs-scan-btn" href="?page=ai" target="_top" title="Quét camera">
             <span class="swcs-scan-corner tl"></span>
             <span class="swcs-scan-corner tr"></span>
             <span class="swcs-scan-corner bl"></span>
@@ -155,13 +127,13 @@ def _render_bottom_nav() -> str:
         </a>
 
         <a class="swcs-nav-item" href="?page=battery" target="_top">
-            <span class="swcs-nav-icon">🔋</span>
-            <span class="swcs-nav-label">Pin</span>
+            <span class="swcs-nav-icon">☣️</span>
+            <span class="swcs-nav-label">Nguy Hại</span>
         </a>
 
         <a class="swcs-nav-item" href="?page=medical" target="_top">
-            <span class="swcs-nav-icon">💉</span>
-            <span class="swcs-nav-label">Y tế</span>
+            <span class="swcs-nav-icon">🗑️</span>
+            <span class="swcs-nav-label">Khác</span>
         </a>
     </div>
     """
@@ -196,6 +168,7 @@ def _render_home_html(vm: dict) -> str:
     )
 
     hero_button_text = vm["hero"].get("button_text", "Bắt đầu hành trình")
+    hero_button_href = vm["hero"].get("button_href", "?page=plastic")
 
     html = f"""
     <div class="swcs-page-bg">
@@ -240,8 +213,8 @@ def _render_home_html(vm: dict) -> str:
                     <p>{hero_subtitle}</p>
 
                     <div class="swcs-hero-actions">
-                        <a href="?page=plastic" target="_top" class="swcs-start-btn">{hero_button_text}</a>
-                        <a href="?page=home" target="_top" class="swcs-outline-btn">Quét bằng camera</a>
+                        <a href="{hero_button_href}" target="_top" class="swcs-start-btn">{hero_button_text}</a>
+                        <a href="?page=ai" target="_top" class="swcs-outline-btn">Quét bằng camera</a>
                     </div>
                 </div>
 

@@ -214,7 +214,9 @@ def _render_actions():
         '    <button class="medical-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
         '  </div>'
         '  <div class="medical-action-card">'
-        '    <button class="medical-action-btn blue" disabled>🤖 Nhận diện rác bằng AI</button>'
+        '    <a href="?page=ai_medical" class="medical-action-btn blue medical-ai-link">'
+        '      🤖 Nhận diện rác bằng AI'
+        '    </a>'
         '  </div>'
         '</div>'
     )

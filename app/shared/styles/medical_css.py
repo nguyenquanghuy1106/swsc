@@ -607,5 +607,18 @@ div[data-testid="stButton"] > button {
         left: 0;
     }
 }
+.medical-ai-link {
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer !important;
+}
+
+.medical-ai-link:hover {
+    color: #ffffff;
+    text-decoration: none !important;
+    filter: brightness(1.05);
+}
 </style>
 """, unsafe_allow_html=True)

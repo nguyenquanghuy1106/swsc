@@ -14,6 +14,11 @@ from features.home.UI.battery_view import render_battery_page
 from features.home.UI.nylon_view import render_nylon_page
 from features.home.UI.medical_view import render_medical_page
 
+from features.home.UI.AI.ai_viewPlastic import render_ai_page
+from features.home.UI.AI.ai_viewNylon import render_ai_nylon_page
+from features.home.UI.AI.ai_viewBattery import render_ai_battery_page
+from features.home.UI.AI.ai_viewMedical import render_ai_medical_page
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -40,6 +45,10 @@ VALID_PAGES = {
     "battery",
     "nylon",
     "medical",
+    "ai",
+    "ai_nylon",
+    "ai_battery",
+    "ai_medical",
 }
 
 
@@ -75,30 +84,39 @@ def load_page_styles(page):
         load_nylon_css()
     elif page == "medical":
         load_medical_css()
+    elif page == "ai":
+        load_plastic_css()
+    elif page == "ai_nylon":
+        load_nylon_css()
+    elif page == "ai_battery":
+        load_battery_css()
+    elif page == "ai_medical":
+        load_medical_css()
 
 
 def render_page(page):
     if page == "login":
         render_login_page()
-
     elif page == "register":
         render_register_page()
-
     elif page == "home":
         render_home_page()
-
     elif page == "plastic":
         render_plastic_page()
-
     elif page == "battery":
         render_battery_page()
-
     elif page == "nylon":
         render_nylon_page()
-
     elif page == "medical":
         render_medical_page()
-
+    elif page == "ai":
+        render_ai_page()
+    elif page == "ai_nylon":
+        render_ai_nylon_page()
+    elif page == "ai_battery":
+        render_ai_battery_page()
+    elif page == "ai_medical":
+        render_ai_medical_page()
     else:
         render_login_page()
 

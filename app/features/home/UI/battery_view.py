@@ -216,7 +216,9 @@ def _render_actions():
         '    <button class="battery-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
         '  </div>'
         '  <div class="battery-action-card">'
-        '    <button class="battery-action-btn blue" disabled>🤖 AI nhận diện</button>'
+        '    <a href="?page=ai_battery" class="battery-action-btn blue battery-ai-link">'
+        '      🤖 AI nhận diện'
+        '    </a>'
         '  </div>'
         '</div>'
     )

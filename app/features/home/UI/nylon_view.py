@@ -216,7 +216,9 @@ def _render_actions():
         '    <button class="nylon-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
         '  </div>'
         '  <div class="nylon-action-card">'
-        '    <button class="nylon-action-btn blue" disabled>🤖 Nhận diện rác bằng AI</button>'
+        '    <a href="?page=ai_nylon" class="nylon-action-btn blue nylon-ai-link">'
+        '      🤖 Nhận diện rác bằng AI'
+        '    </a>'
         '  </div>'
         '</div>'
     )

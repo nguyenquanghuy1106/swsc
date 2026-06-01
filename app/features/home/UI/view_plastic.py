@@ -221,14 +221,19 @@ def _render_bottom_actions():
         '  <div class="plastic-action-card">'
         '    <button class="plastic-action-btn red" disabled>🔋 Tìm hiểu về Nhựa</button>'
         '  </div>'
+
         '  <div class="plastic-action-card">'
         '    <button class="plastic-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
         '  </div>'
+
         '  <div class="plastic-action-card">'
-        '    <button class="plastic-action-btn blue" disabled>🤖 Nhận diện rác bằng AI</button>'
+        '    <a href="?page=ai" class="plastic-action-btn blue plastic-ai-link">'
+        '      🤖 Nhận diện rác bằng AI'
+        '    </a>'
         '  </div>'
         '</div>'
     )
+
     st.markdown(action_html, unsafe_allow_html=True)
 
 
