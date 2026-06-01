@@ -1,23 +1,46 @@
 """
 Quét camera realtime bằng model EfficientNet đã train.
 
-Bản này:
-- AUTO tự bám theo vật.
-- Lọc bớt người bằng cách bỏ contour quá lớn/quá cao/quá rộng.
-- Nhấn C đổi mode: AUTO / CENTER / FULL_FRAME.
-- Nhấn R reset background.
-- Nhấn Q thoát.
+Phím:
+- P: chụp/khóa vùng vật đang quét
+- P lần nữa: bỏ khóa
+- S: lưu ảnh + lưu database + cộng điểm
+- C: đổi mode AUTO / CENTER / FULL_FRAME
+- R: reset background
+- Q: thoát
 """
 
+import sys
+import argparse
 from pathlib import Path
 from collections import deque
 import json
 import time
+
 import cv2
 import numpy as np
 import tensorflow as tf
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = BASE_DIR.parent
+APP_DIR = PROJECT_DIR / "app"
+
+if str(APP_DIR) not in sys.path:
+    sys.path.append(str(APP_DIR))
+
+from features.home.logic.AI.ai_history_service import save_ai_scan_result
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--user_id", type=int, default=0)
+parser.add_argument("--user_name", type=str, default="Guest")
+args = parser.parse_args()
+
+CURRENT_USER_ID = args.user_id
+CURRENT_USER_NAME = args.user_name
+
+
 MODEL_PATH = BASE_DIR / "models" / "waste_efficientnet.keras"
 CLASS_PATH = BASE_DIR / "models" / "class_names.json"
 CAPTURE_DIR = BASE_DIR / "captured_frames"
@@ -40,11 +63,18 @@ MAX_ASPECT_RATIO = 3.2
 ROI_MODES = ["AUTO_ROI", "CENTER_ROI", "FULL_FRAME"]
 roi_mode_index = 0
 
+locked_scan = False
+locked_frame = None
+locked_box = None
+
 if not MODEL_PATH.exists():
     raise FileNotFoundError(
         f"Không thấy model: {MODEL_PATH}\n"
         "Hãy train trước bằng lệnh: python src/train_efficientnet.py"
     )
+
+if not CLASS_PATH.exists():
+    raise FileNotFoundError(f"Không thấy file class_names.json: {CLASS_PATH}")
 
 model = tf.keras.models.load_model(MODEL_PATH)
 
@@ -116,23 +146,18 @@ def is_valid_object_contour(cnt, frame_shape, min_area):
     width_ratio = bw / w
     aspect_ratio = bw / max(1, bh)
 
-    # Bỏ vùng quá lớn: thường là người hoặc thân người
     if area_ratio > MAX_OBJECT_AREA_RATIO:
         return False
 
-    # Bỏ vùng quá cao: thường là người đứng trước camera
     if height_ratio > MAX_OBJECT_HEIGHT_RATIO:
         return False
 
-    # Bỏ vùng quá rộng: thường là nền/người chiếm nhiều khung hình
     if width_ratio > MAX_OBJECT_WIDTH_RATIO:
         return False
 
-    # Bỏ box quá dọc hoặc quá ngang bất thường
     if aspect_ratio < MIN_ASPECT_RATIO or aspect_ratio > MAX_ASPECT_RATIO:
         return False
 
-    # Bỏ vùng chạm mép trên nhiều: thường là đầu/thân người
     if y < int(h * 0.05) and bh > int(h * 0.35):
         return False
 
@@ -146,8 +171,6 @@ def find_object_roi(frame):
     min_area = h * w * MIN_OBJECT_AREA_RATIO
 
     fg = bg_subtractor.apply(frame)
-
-    # Loại bóng
     _, mask = cv2.threshold(fg, 200, 255, cv2.THRESH_BINARY)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
@@ -158,7 +181,7 @@ def find_object_roi(frame):
     contours, _ = cv2.findContours(
         mask,
         cv2.RETR_EXTERNAL,
-        cv2.CHAIN_APPROX_SIMPLE
+        cv2.CHAIN_APPROX_SIMPLE,
     )
 
     if not contours:
@@ -205,11 +228,8 @@ def preprocess_frame(frame_bgr):
 
 def predict_with_tta(input_frame):
     frames = [input_frame]
-
-    # Lật ngang
     frames.append(cv2.flip(input_frame, 1))
 
-    # Crop giữa nhẹ
     h, w = input_frame.shape[:2]
     crop_scale = 0.90
     ch, cw = int(h * crop_scale), int(w * crop_scale)
@@ -237,7 +257,7 @@ def draw_text_box(frame, lines, x=20, y=35):
             cv2.FONT_HERSHEY_SIMPLEX,
             0.78,
             (0, 0, 0),
-            4
+            4,
         )
 
         cv2.putText(
@@ -247,7 +267,7 @@ def draw_text_box(frame, lines, x=20, y=35):
             cv2.FONT_HERSHEY_SIMPLEX,
             0.78,
             (255, 255, 255),
-            2
+            2,
         )
 
 
@@ -259,8 +279,9 @@ if not cap.isOpened():
     )
 
 print("Đang mở camera...")
-print("q: thoát | s: lưu ảnh | c: đổi chế độ ROI | r: reset background")
-print("Mẹo: vừa mở camera nên để nền trống 1-2 giây rồi mới đưa vật vào.")
+print(f"User ID: {CURRENT_USER_ID} | User Name: {CURRENT_USER_NAME}")
+print("Q: thoát | S: lưu DB | P: khóa/bỏ khóa vật | C: đổi ROI | R: reset background")
+print("Mẹo: để nền trống 1-2 giây rồi mới đưa vật vào.")
 
 while True:
     ret, frame = cap.read()
@@ -272,23 +293,35 @@ while True:
     display = frame.copy()
     roi_mode = ROI_MODES[roi_mode_index]
     found_object = True
+    box = None
 
-    if roi_mode == "AUTO":
-        input_frame, box, mask, found_object = find_object_roi(frame)
+    if locked_scan and locked_frame is not None:
+        input_frame = locked_frame.copy()
 
-        x1, y1, x2, y2 = box
-        color = (0, 255, 0) if found_object else (0, 180, 255)
+        if locked_box is not None:
+            x1, y1, x2, y2 = locked_box
+            cv2.rectangle(display, (x1, y1), (x2, y2), (0, 255, 255), 3)
 
-        cv2.rectangle(display, (x1, y1), (x2, y2), color, 2)
-
-    elif roi_mode == "CENTER":
-        input_frame, box = crop_center_roi(frame, ROI_SCALE)
-
-        x1, y1, x2, y2 = box
-        cv2.rectangle(display, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        status_text = "LOCKED_CAPTURE"
 
     else:
-        input_frame = frame
+        status_text = "LIVE_SCAN"
+
+        if roi_mode == "AUTO_ROI":
+            input_frame, box, mask, found_object = find_object_roi(frame)
+
+            x1, y1, x2, y2 = box
+            color = (0, 255, 0) if found_object else (0, 180, 255)
+            cv2.rectangle(display, (x1, y1), (x2, y2), color, 2)
+
+        elif roi_mode == "CENTER_ROI":
+            input_frame, box = crop_center_roi(frame, ROI_SCALE)
+
+            x1, y1, x2, y2 = box
+            cv2.rectangle(display, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        else:
+            input_frame = frame
 
     pred = predict_with_tta(input_frame)
 
@@ -301,22 +334,25 @@ while True:
     if confidence >= CONF_THRESHOLD:
         main_label = class_names[idx]
     else:
-        main_label = "Không chắc chắn"
+        main_label = "Khong chac chan"
 
     top3_idx = avg_pred.argsort()[-3:][::-1]
 
     lines = [
         f"Mode: {roi_mode}",
+        f"Status: {status_text}",
         f"{main_label}: {confidence * 100:.2f}%",
     ]
 
-    if roi_mode == "AUTO" and not found_object:
-        lines.append("Đang tìm vật / dung box gần nhất")
+    if roi_mode == "AUTO_ROI" and not found_object and not locked_scan:
+        lines.append("Dang tim vat / dung box gan nhat")
 
     for rank, i in enumerate(top3_idx, start=1):
         lines.append(
             f"Top {rank}: {class_names[int(i)]} {avg_pred[int(i)] * 100:.2f}%"
         )
+
+
 
     draw_text_box(display, lines)
 
@@ -328,12 +364,61 @@ while True:
         break
 
     if key == ord("s"):
-        filename = CAPTURE_DIR / f"frame_{int(time.time())}.jpg"
+        if CURRENT_USER_ID == 0:
+            print("Không có user_id. Hãy đăng nhập rồi mở camera từ web.")
+            continue
+
+        if confidence < CONF_THRESHOLD:
+            print(f"Độ chính xác thấp: {confidence * 100:.2f}%. Không lưu DB.")
+            continue
+
+        filename = CAPTURE_DIR / f"{main_label}_{int(time.time())}.jpg"
         cv2.imwrite(str(filename), frame)
-        print("Đã lưu:", filename)
+
+        try:
+            result = save_ai_scan_result(
+                user_id=CURRENT_USER_ID,
+                user_name=CURRENT_USER_NAME,
+                predicted_class=main_label,
+                confidence=confidence * 100,
+                image_name=filename.name,
+            )
+
+            if result["success"]:
+                print(
+                    f"Đã lưu DB thành công | "
+                    f"Bảng: {result['table']} | "
+                    f"Nhóm: {result['group']} | "
+                    f"+{result['score']} điểm | "
+                    f"Tổng điểm: {result['total_score']}"
+                )
+            else:
+                print(result["message"])
+
+        except Exception as e:
+            print("Lỗi khi lưu database:", e)
+
+    if key == ord("p"):
+        if not locked_scan:
+            locked_scan = True
+            locked_frame = input_frame.copy()
+            locked_box = box
+
+            pred_history.clear()
+            print("Đã khóa vật đang quét.")
+        else:
+            locked_scan = False
+            locked_frame = None
+            locked_box = None
+            pred_history.clear()
+            print("Đã bỏ khóa. Quét realtime lại.")
 
     if key == ord("c"):
         roi_mode_index = (roi_mode_index + 1) % len(ROI_MODES)
+
+        locked_scan = False
+        locked_frame = None
+        locked_box = None
 
         pred_history.clear()
         box_history.clear()
@@ -344,8 +429,12 @@ while True:
         bg_subtractor = cv2.createBackgroundSubtractorMOG2(
             history=300,
             varThreshold=28,
-            detectShadows=True
+            detectShadows=True,
         )
+
+        locked_scan = False
+        locked_frame = None
+        locked_box = None
 
         pred_history.clear()
         box_history.clear()

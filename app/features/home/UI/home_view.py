@@ -164,8 +164,8 @@ def _render_bottom_nav() -> str:
             <span class="swcs-nav-label">Bài đăng</span>
         </a>
 
-        <a class="swcs-scan-btn" href="{_page_link("ai")}" target="_top" title="Quét camera">
-            <span class="swcs-nav-ai">🤖</span>
+        <a class="swcs-scan-btn" href="{_page_link("camera")}" target="_top" title="Quét camera">
+            <span class="swcs-nav-ai">📸</span>
         </a>
 
         <a class="swcs-nav-item" href="{_page_link("news")}" target="_top">
@@ -173,7 +173,7 @@ def _render_bottom_nav() -> str:
             <span class="swcs-nav-label">Tin tức</span>
         </a>
 
-        <a class="swcs-nav-item" href="{_page_link("medical")}" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("profile")}" target="_top">
             <span class="swcs-nav-icon">👤</span>
             <span class="swcs-nav-label">Profile</span>
         </a>
@@ -261,7 +261,7 @@ def _render_home_html(vm):
                         </a>
 
                         <a href="{_page_link("ai")}" target="_top" class="swcs-outline-btn">
-                            Quét bằng camera
+                            Phân Loại Rác Ngay
                         </a>
                     </div>
                 </div>
