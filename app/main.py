@@ -7,17 +7,16 @@ from shared.styles.plastic_css import load_plastic_css
 from shared.styles.battery_css import load_battery_css
 from shared.styles.nylon_css import load_nylon_css
 from shared.styles.medical_css import load_medical_css
+from shared.styles.user.post_composer_css import load_post_composer_css
+from shared.styles.user.news_css import load_news_css
 
 from features.home.UI.home_view import render_home_page
 from features.home.UI.view_plastic import render_plastic_page
 from features.home.UI.battery_view import render_battery_page
 from features.home.UI.nylon_view import render_nylon_page
 from features.home.UI.medical_view import render_medical_page
-
-from features.home.UI.AI.ai_viewPlastic import render_ai_page
-from features.home.UI.AI.ai_viewNylon import render_ai_nylon_page
-from features.home.UI.AI.ai_viewBattery import render_ai_battery_page
-from features.home.UI.AI.ai_viewMedical import render_ai_medical_page
+from features.home.UI.user.post_composer_view import render_post_composer_page
+from features.home.UI.user.news_view import render_news_page
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -45,10 +44,8 @@ VALID_PAGES = {
     "battery",
     "nylon",
     "medical",
-    "ai",
-    "ai_nylon",
-    "ai_battery",
-    "ai_medical",
+    "post",
+    "news",
 }
 
 
@@ -84,14 +81,10 @@ def load_page_styles(page):
         load_nylon_css()
     elif page == "medical":
         load_medical_css()
-    elif page == "ai":
-        load_plastic_css()
-    elif page == "ai_nylon":
-        load_nylon_css()
-    elif page == "ai_battery":
-        load_battery_css()
-    elif page == "ai_medical":
-        load_medical_css()
+    elif page == "post":
+        load_post_composer_css()
+    elif page == "news":
+        load_news_css()
 
 
 def render_page(page):
@@ -101,6 +94,10 @@ def render_page(page):
         render_register_page()
     elif page == "home":
         render_home_page()
+    elif page == "post":
+        render_post_composer_page()
+    elif page == "news":
+        render_news_page()
     elif page == "plastic":
         render_plastic_page()
     elif page == "battery":
@@ -109,14 +106,6 @@ def render_page(page):
         render_nylon_page()
     elif page == "medical":
         render_medical_page()
-    elif page == "ai":
-        render_ai_page()
-    elif page == "ai_nylon":
-        render_ai_nylon_page()
-    elif page == "ai_battery":
-        render_ai_battery_page()
-    elif page == "ai_medical":
-        render_ai_medical_page()
     else:
         render_login_page()
 

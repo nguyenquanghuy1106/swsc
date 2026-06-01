@@ -7,398 +7,539 @@ def load_post_composer_css():
         <style>
         .stApp {
             background:
-                radial-gradient(circle at top left, rgba(168, 208, 132, 0.18), transparent 24%),
-                radial-gradient(circle at bottom right, rgba(186, 224, 160, 0.18), transparent 24%),
-                linear-gradient(180deg, #f7fbf5 0%, #edf5ea 100%);
+                linear-gradient(rgba(245, 255, 236, 0.88), rgba(245, 255, 236, 0.88)),
+                radial-gradient(circle at 20% 20%, #dff5c8 0 12%, transparent 13%),
+                radial-gradient(circle at 80% 30%, #d9f4cc 0 10%, transparent 11%),
+                radial-gradient(circle at 30% 80%, #e5f8d7 0 14%, transparent 15%);
+            background-color: #f4ffe9;
         }
 
-        .main .block-container {
-            max-width: 1300px;
-            padding-top: 0.8rem;
-            padding-bottom: 1rem;
+        header[data-testid="stHeader"] {
+            display: none;
         }
 
-        .swcs-community-nav {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.90);
-            border: 1px solid rgba(232, 239, 226, 0.95);
-            border-radius: 22px;
-            padding: 18px 24px;
+        .block-container {
+            max-width: 1180px;
+            padding-top: 20px;
+            padding-bottom: 110px;
+        }
+
+        .swsc-topbar {
+            height: 58px;
+            background: rgba(255, 255, 255, 0.92);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 18px;
-            box-shadow: 0 16px 34px rgba(78, 104, 62, 0.08);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            margin-bottom: 22px;
+            padding: 0 32px;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 18px rgba(57, 100, 38, 0.12);
+            margin: -20px -20px 22px -20px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
 
-        .swcs-community-brand {
+        .swsc-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 34px;
+            gap: 8px;
+            font-size: 28px;
             font-weight: 900;
-            color: #4e9432;
-            flex-shrink: 0;
+            color: #2f7d32;
         }
 
-        .swcs-community-brand-icon {
-            font-size: 34px;
-        }
-
-        .swcs-community-links {
+        .swsc-menu {
             display: flex;
+            gap: 18px;
             align-items: center;
-            justify-content: center;
-            gap: 26px;
-            flex: 1;
-            flex-wrap: wrap;
         }
 
-        .swcs-community-links a {
-            color: #3f4c3d;
+        .swsc-menu a {
             text-decoration: none;
-            font-size: 16px;
+            color: #202020;
+            font-size: 15px;
+            padding: 10px 18px;
+            border-radius: 24px;
+        }
+
+        .swsc-menu a.active {
+            background: #c9edbc;
+            color: #346b29;
             font-weight: 700;
         }
 
-        .swcs-community-search {
+        .swsc-user-icons {
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.9);
-            border: 1px solid #e5ebe1;
-            box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+            gap: 18px;
             font-size: 20px;
-            flex-shrink: 0;
         }
 
-        .swcs-community-main-card {
+        .swsc-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 270px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .composer-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1.5px solid #84b96f;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(54, 100, 37, 0.18);
+            padding: 22px;
+        }
+
+        .composer-title {
+            color: #2e7d32;
+            font-size: 31px;
+            font-weight: 900;
+            margin-bottom: 18px;
+            line-height: 1.25;
+        }
+
+        .field-label {
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 7px;
+            font-size: 16px;
+        }
+
+        .title-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.52);
-            border: 1px solid rgba(233, 239, 227, 0.94);
-            border-radius: 34px;
-            padding: 20px;
-            box-shadow: 0 18px 42px rgba(78, 104, 62, 0.08);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border: 1.6px solid #6da85d;
+            border-radius: 18px;
+            padding: 13px 18px;
+            font-size: 16px;
+            outline: none;
+            background: white;
+            margin-bottom: 18px;
         }
 
-        .swcs-composer-user {
+        .category-row {
             display: flex;
-            align-items: center;
-            gap: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
         }
 
-        .swcs-composer-avatar {
-            width: 62px;
-            height: 62px;
-            border-radius: 50%;
+        .category-pill {
+            padding: 10px 18px;
+            border-radius: 24px;
+            border: 1.4px solid rgba(0,0,0,.2);
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 3px 8px rgba(0,0,0,.08);
+        }
+
+        .category-pill.organic {
+            background: linear-gradient(180deg, #eaffdf, #bdf2aa);
+        }
+
+        .category-pill.recycle {
+            background: linear-gradient(180deg, #e6f3ff, #afd6ff);
+        }
+
+        .category-pill.danger {
+            background: linear-gradient(180deg, #ffe8e4, #ffb9b0);
+        }
+
+        .category-pill.tips {
+            background: linear-gradient(180deg, #fff8d8, #ffe999);
+        }
+
+        .editor-box {
+            border: 1.8px solid #73a961;
+            border-radius: 18px;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.92);
-            box-shadow: 0 8px 18px rgba(15,23,42,0.08);
-            flex-shrink: 0;
+            background: #fffdf5;
+            margin-bottom: 18px;
         }
 
-        .swcs-composer-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        .editor-toolbar {
+            display: flex;
+            gap: 16px;
+            padding: 12px 16px;
+            font-size: 21px;
+            font-weight: 900;
+            border-bottom: 1px solid #e5e0be;
+            background: #fff8d8;
         }
 
-        .swcs-composer-meta {
+        .editor-content {
+            padding: 16px;
+            min-height: 92px;
+            font-size: 17px;
+            line-height: 1.65;
+            color: #222;
+        }
+
+        .upload-box {
+            border: 2px dashed #9c945d;
+            background: #fff9df;
+            border-radius: 18px;
+            height: 135px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        .swcs-composer-name {
-            font-size: 20px;
-            font-weight: 900;
-            color: #334034;
-            line-height: 1.1;
-        }
-
-        .swcs-composer-chip {
-            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            width: fit-content;
-            padding: 8px 14px;
-            border-radius: 12px;
-            background: #68879b;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .swcs-top-post-btn-space {
-            height: 24px;
-        }
-
-        .swcs-bottom-actions-shell {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.64);
-            border: 1px solid rgba(234,239,228,0.96);
-            border-radius: 26px;
-            padding: 18px;
-            box-shadow: 0 12px 30px rgba(78,104,62,0.06);
-        }
-
-        .swcs-action-card {
-            background: rgba(255,255,255,0.88);
-            border: 1px solid #e8ede3;
-            border-radius: 18px;
-            padding: 18px 20px;
-            min-height: 78px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 8px 18px rgba(15,23,42,0.05);
-            transition: 0.22s ease;
-        }
-
-        .swcs-action-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .swcs-action-icon {
-            font-size: 28px;
-            width: 40px;
+            margin-bottom: 18px;
+            color: #222;
+            font-size: 16px;
             text-align: center;
         }
 
-        .swcs-action-label {
-            font-size: 18px;
-            font-weight: 800;
-            color: #3f4a3d;
+        .upload-icon {
+            font-size: 48px;
         }
 
-        .swcs-mini-dots {
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .draft-btn {
+            background: white;
+            color: #222;
+            border: 1.5px solid #d4d4d4;
+            padding: 12px 22px;
+            border-radius: 25px;
+            font-size: 16px;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,.08);
+        }
+
+        .post-btn {
+            background: linear-gradient(135deg, #69c798, #24aaa3);
+            color: white;
+            border: none;
+            padding: 14px 27px;
+            border-radius: 26px;
+            font-weight: 900;
+            font-size: 16px;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(36, 170, 163, .35);
+        }
+
+        .sidebar-card {
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 5px 16px rgba(54, 100, 37, 0.18);
+            border: 1.3px solid rgba(74, 126, 58, .35);
+            font-size: 16px;
+        }
+
+        .sidebar-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            color: #111;
+        }
+
+        .challenge-card {
+            background: #dff3cf;
+        }
+
+        .hashtag-card {
+            background: #d9efff;
+        }
+
+        .tip-card {
+            background: #fff1b8;
+        }
+
+        .hashtag {
+            display: inline-block;
+            background: rgba(255,255,255,.55);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 5px 0;
+            font-weight: 700;
+        }
+
+        .swcs-bottom-nav {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            width: min(560px, calc(100% - 24px));
+            height: 72px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1.5px solid #a6d995;
+            border-radius: 28px;
+            box-shadow: 0 10px 32px rgba(47, 125, 50, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 9999;
+        }
+
+        .swcs-nav-item {
+            text-decoration: none;
+            color: #4a4a4a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            gap: 3px;
+        }
+
+        .swcs-nav-item.active {
+            color: #2e7d32;
+        }
+
+        .swcs-nav-icon {
+            font-size: 22px;
+        }
+
+        .swcs-scan-btn {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #42c96f, #1aa6a6);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding-top: 14px;
+            text-decoration: none;
+            margin-top: -34px;
+            box-shadow: 0 8px 24px rgba(26, 166, 166, 0.42);
+            border: 5px solid white;
         }
 
-        .swcs-mini-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(121, 186, 88, 0.38);
-        }
-
-        .swcs-mini-dot.active {
-            background: #8bc34a;
-        }
-
-        .swcs-helper-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .swcs-helper-badge {
-            padding: 7px 12px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.75);
-            border: 1px solid #e7ece4;
-            font-size: 13px;
-            font-weight: 700;
-            color: #576056;
-        }
-
-        .swcs-post-message {
-            padding: 12px 14px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 700;
-            margin: 10px 0 12px 0;
-        }
-
-        .swcs-post-success {
-            background: rgba(111, 190, 104, 0.16);
-            color: #2f6d25;
-            border: 1px solid rgba(111, 190, 104, 0.28);
-        }
-
-        .swcs-post-error {
-            background: rgba(239, 68, 68, 0.10);
-            color: #b42318;
-            border: 1px solid rgba(239, 68, 68, 0.18);
-        }
-
-        div[data-baseweb="select"] {
-            border-radius: 12px !important;
-            min-height: 48px !important;
-            background: rgba(255,255,255,0.92) !important;
-            border: 1px solid #dbe5d2 !important;
-            box-shadow: 0 8px 18px rgba(15,23,42,0.05) !important;
-        }
-
-        div[data-testid="stFileUploader"] section {
-            border-radius: 16px !important;
-            background: rgba(255,255,255,0.72) !important;
-            border: 1px dashed #dfe7d9 !important;
-        }
-
-        label[data-testid="stWidgetLabel"] p {
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            color: #454545 !important;
-        }
-
-        div[data-testid="stTextArea"] textarea {
-            min-height: 320px !important;
-            border-radius: 22px !important;
-            border: 1px solid rgba(234, 239, 228, 0.95) !important;
-            background: rgba(255,255,255,0.42) !important;
-            font-size: 26px !important;
-            line-height: 1.5 !important;
-            color: #4a5148 !important;
-            padding: 18px 18px !important;
-            box-shadow: none !important;
-            resize: none !important;
-        }
-
-        div[data-testid="stTextArea"] textarea::placeholder {
-            color: #7e857d !important;
-            opacity: 1 !important;
-        }
-
-        div[data-testid="stButton"] > button {
-            width: 100%;
-            min-height: 54px;
-            border: none !important;
-            border-radius: 999px !important;
-            background: linear-gradient(90deg, #7fb51b 0%, #88bc23 100%) !important;
-            color: #ffffff !important;
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            box-shadow: 0 12px 24px rgba(113, 162, 31, 0.22) !important;
-            transition: 0.24s ease !important;
-        }
-
-        div[data-testid="stButton"] > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 26px rgba(113, 162, 31, 0.26) !important;
-        }
-        /* ===== EXPANDER FIX ===== */
-        div[data-testid="stExpander"] {
-            border-radius: 18px !important;
-            border: 1px solid #dfe7d9 !important;
-            background: rgba(255,255,255,0.85) !important;
-            box-shadow: 0 8px 20px rgba(15,23,42,0.05);
-            overflow: hidden;
-        }
-
-        /* Header expander */
-        div[data-testid="stExpander"] summary {
-            font-size: 16px !important;
-            font-weight: 800 !important;
-            color: #3c4a3a !important;
-            padding: 14px 16px !important;
-            background: rgba(245, 250, 242, 0.9) !important;
-            border-radius: 18px !important;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        /* Hover đẹp hơn */
-        div[data-testid="stExpander"] summary:hover {
-            background: rgba(226, 244, 212, 0.9) !important;
-        }
-
-        /* Nội dung bên trong */
-        div[data-testid="stExpander"] div[role="region"] {
-            padding: 14px 16px 16px 16px !important;
-            background: rgba(255,255,255,0.9) !important;
+        .swcs-nav-ai {
+            font-size: 31px;
         }
 
         @media (max-width: 900px) {
-            .swcs-community-nav {
-                flex-wrap: wrap;
-                justify-content: center;
+            .swsc-layout {
+                grid-template-columns: 1fr;
             }
 
-            .swcs-community-links {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                gap: 18px;
-            }
-
-            div[data-testid="stTextArea"] textarea {
-                font-size: 22px !important;
-                min-height: 260px !important;
-            }
-
-            .swcs-top-post-btn-space {
+            .swsc-menu {
                 display: none;
             }
-        }
 
-        @media (max-width: 640px) {
-            .main .block-container {
-                padding-top: 0.45rem;
-                padding-bottom: 0.7rem;
+            .composer-title {
+                font-size: 25px;
             }
 
-            .swcs-community-nav {
-                padding: 14px 14px;
-                border-radius: 18px;
-            }
-
-            .swcs-community-brand {
-                font-size: 28px;
-            }
-
-            .swcs-community-links a {
-                font-size: 14px;
-            }
-
-            .swcs-community-main-card {
-                padding: 12px;
-                border-radius: 24px;
-            }
-
-            .swcs-composer-avatar {
-                width: 52px;
-                height: 52px;
-            }
-
-            .swcs-composer-name {
-                font-size: 18px;
-            }
-
-            .swcs-composer-chip {
-                font-size: 13px;
-                padding: 7px 12px;
-            }
-
-            div[data-testid="stTextArea"] textarea {
-                font-size: 18px !important;
-                min-height: 220px !important;
-            }
-
-            .swcs-action-card {
-                min-height: 70px;
-                padding: 14px 16px;
-            }
-
-            .swcs-action-label {
-                font-size: 16px;
+            .swsc-topbar {
+                padding: 0 16px;
             }
         }
+        .composer-card-title {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1.5px solid #84b96f;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(54, 100, 37, 0.18);
+    padding: 24px;
+    margin-bottom: 18px;
+}
+
+.stTextInput label,
+.stTextArea label,
+.stRadio label,
+.stFileUploader label {
+    color: #111 !important;
+    font-weight: 800 !important;
+}
+
+.stTextInput input,
+.stTextArea textarea {
+    background: #ffffff !important;
+    color: #111 !important;
+    border-radius: 14px !important;
+}
+
+.stButton button {
+    border-radius: 18px !important;
+    font-weight: 800 !important;
+}
+
+.stRadio div[role="radiogroup"] label {
+    color: #111 !important;
+}
+/* Hiện chữ rõ hơn */
+.stTextInput label,
+.stTextArea label,
+.stRadio label,
+.stFileUploader label {
+    color: #163b16 !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+}
+
+.stTextInput input,
+.stTextArea textarea {
+    background: #ffffff !important;
+    color: #1f1f1f !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    border: 1.8px solid #6da85d !important;
+    border-radius: 14px !important;
+}
+
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #5f6f5f !important;
+    opacity: 1 !important;
+}
+
+.stRadio div[role="radiogroup"] label p {
+    color: #1f1f1f !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+}
+
+.stFileUploader section {
+    background: #ffffff !important;
+    border: 2px dashed #6da85d !important;
+    border-radius: 16px !important;
+}
+
+.stFileUploader section * {
+    color: #1f1f1f !important;
+}
+
+.sidebar-card,
+.sidebar-card h3,
+.sidebar-card div,
+.hashtag {
+    color: #1f1f1f !important;
+}
+
+.hashtag {
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+.stButton button {
+    background: linear-gradient(135deg, #69c798, #24aaa3) !important;
+    color: white !important;
+    border-radius: 18px !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    border: none !important;
+}
+/* Làm giao diện đẹp hơn */
+.block-container {
+    padding-top: 50px !important;
+}
+
+.composer-card-title {
+    background: linear-gradient(135deg, #ffffff, #f4fff1);
+}
+
+.composer-title::before {
+    content: "🌍 ";
+}
+
+.composer-title::after {
+    content: " ✨♻️";
+}
+
+.stTextInput label::before {
+    content: "📝 ";
+}
+
+.stRadio > label::before {
+    content: "🏷️ ";
+}
+
+.stTextArea label::before {
+    content: "💬 ";
+}
+
+.stFileUploader label::before {
+    content: "📸 ";
+}
+
+.stRadio div[role="radiogroup"] label:nth-child(1) p::before {
+    content: "🍃 ";
+}
+
+.stRadio div[role="radiogroup"] label:nth-child(2) p::before {
+    content: "♻️ ";
+}
+
+.stRadio div[role="radiogroup"] label:nth-child(3) p::before {
+    content: "⚠️ ";
+}
+
+.stRadio div[role="radiogroup"] label:nth-child(4) p::before {
+    content: "💡 ";
+}
+
+.stTextInput input,
+.stTextArea textarea {
+    box-shadow: 0 4px 14px rgba(47, 125, 50, 0.12) !important;
+}
+
+.stFileUploader section {
+    background: linear-gradient(135deg, #ffffff, #f8fff2) !important;
+    box-shadow: 0 4px 14px rgba(47, 125, 50, 0.12) !important;
+}
+
+.stButton button {
+    height: 50px !important;
+    box-shadow: 0 8px 22px rgba(36, 170, 163, 0.28) !important;
+}
+
+.stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(36, 170, 163, 0.38) !important;
+}
+
+.challenge-card h3::after {
+    content: " 🌱";
+}
+
+.hashtag-card h3::after {
+    content: " 🔥";
+}
+
+.tip-card h3::after {
+    content: " ✅";
+}
+
+.sidebar-card {
+    transition: 0.25s ease;
+}
+
+.sidebar-card:hover {
+    transform: translateY(-4px);
+}
+
+.hashtag::before {
+    content: "🔖 ";
+}
+
+.swcs-bottom-nav {
+    backdrop-filter: blur(14px);
+}
+
+.swcs-nav-item:hover {
+    transform: translateY(-3px);
+}
+
+.swcs-scan-btn {
+    animation: swcsPulse 1.8s infinite;
+}
+
+@keyframes swcsPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(36, 170, 163, 0.45);
+    }
+    70% {
+        box-shadow: 0 0 0 16px rgba(36, 170, 163, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(36, 170, 163, 0);
+    }
+}
         </style>
         """,
         unsafe_allow_html=True,
