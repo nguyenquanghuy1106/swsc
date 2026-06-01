@@ -28,7 +28,7 @@ def _restore_user_from_query():
         st.session_state["is_login"] = True
 
 
-def _auth_query() -> str:
+def _auth_query():
     user_id = st.session_state.get("user_id")
     user_name = st.session_state.get("user_name")
 
@@ -38,7 +38,7 @@ def _auth_query() -> str:
     return ""
 
 
-def _page_link(page: str) -> str:
+def _page_link(page):
     return f"?page={page}{_auth_query()}"
 
 
@@ -66,7 +66,7 @@ def load_home_view_model():
     }
 
 
-def _image_to_base64(image_path: str) -> str:
+def _image_to_base64(image_path):
     if not image_path:
         return ""
 
@@ -77,8 +77,6 @@ def _image_to_base64(image_path: str) -> str:
         print(f"[IMAGE NOT FOUND] {path}")
         return ""
 
-    suffix = path.suffix.lower()
-
     mime_map = {
         ".png": "image/png",
         ".jpg": "image/jpeg",
@@ -87,7 +85,7 @@ def _image_to_base64(image_path: str) -> str:
         ".svg": "image/svg+xml",
     }
 
-    mime_type = mime_map.get(suffix, "image/png")
+    mime_type = mime_map.get(path.suffix.lower(), "image/png")
 
     with open(path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode("utf-8")
@@ -95,7 +93,7 @@ def _image_to_base64(image_path: str) -> str:
     return f"data:{mime_type};base64,{encoded}"
 
 
-def _safe_image(path: str, css_class: str, alt: str = "") -> str:
+def _safe_image(path, css_class, alt=""):
     src = _image_to_base64(path)
 
     if src:
@@ -104,40 +102,32 @@ def _safe_image(path: str, css_class: str, alt: str = "") -> str:
     return '<div class="swcs-img-fallback">♻</div>'
 
 
-def _category_icon_by_code(code: str) -> str:
+def _category_icon_by_code(code):
     code = str(code).lower().strip()
 
-    if code == "plastic":
-        return "♻️"
+    icons = {
+        "plastic": "♻️",
+        "nylon": "🍃",
+        "battery": "☣️",
+        "medical": "🗑️",
+    }
 
-    if code == "nylon":
-        return "🍃"
-
-    if code == "battery":
-        return "☣️"
-
-    if code == "medical":
-        return "🗑️"
-
-    return "♻️"
+    return icons.get(code, "♻️")
 
 
-def _category_color_class(index: int) -> str:
+def _category_color_class(index):
     colors = ["yellow", "blue", "pink", "green"]
     return colors[index % len(colors)]
 
 
-def _fix_href(href: str) -> str:
+def _fix_href(href):
     href = str(href or "?page=home")
     page = href.replace("?page=", "").split("&")[0]
 
-    if page:
-        return _page_link(page)
-
-    return _page_link("home")
+    return _page_link(page or "home")
 
 
-def _render_categories(categories: list[dict]) -> str:
+def _render_categories(categories):
     html = ""
 
     for index, item in enumerate(categories[:4]):
@@ -160,41 +150,39 @@ def _render_categories(categories: list[dict]) -> str:
     return html
 
 
-def _render_bottom_nav() -> str:
+def _render_bottom_nav():
     return f"""
     <div class="swcs-bottom-nav">
+
         <a class="swcs-nav-item active" href="{_page_link("home")}" target="_top">
-            <span class="swcs-nav-icon">⌂</span>
+            <span class="swcs-nav-icon">🏠</span>
             <span class="swcs-nav-label">Trang chủ</span>
         </a>
 
-        <a class="swcs-nav-item" href="{_page_link("plastic")}" target="_top">
-            <span class="swcs-nav-icon">♻️</span>
-            <span class="swcs-nav-label">Tái Chế</span>
+        <a class="swcs-nav-item" href="{_page_link("post")}" target="_top">
+            <span class="swcs-nav-icon">📚</span>
+            <span class="swcs-nav-label">Bài đăng</span>
         </a>
 
-        <a class="swcs-scan-btn" href="{_page_link("ai")}" target="_top" title="Quét camera">
-            <span class="swcs-scan-corner tl"></span>
-            <span class="swcs-scan-corner tr"></span>
-            <span class="swcs-scan-corner bl"></span>
-            <span class="swcs-scan-corner br"></span>
-            <span class="swcs-scan-dot"></span>
+        <a class="swcs-scan-btn" href="{_page_link("ai")}" target="_top" title="AI nhận diện">
+            <span class="swcs-nav-ai">🤖</span>
         </a>
 
-        <a class="swcs-nav-item" href="{_page_link("battery")}" target="_top">
-            <span class="swcs-nav-icon">☣️</span>
-            <span class="swcs-nav-label">Nguy Hại</span>
+        <a class="swcs-nav-item" href="{_page_link("news")}" target="_top">
+            <span class="swcs-nav-icon">📰</span>
+            <span class="swcs-nav-label">Tin tức</span>
         </a>
 
-        <a class="swcs-nav-item" href="{_page_link("medical")}" target="_top">
-            <span class="swcs-nav-icon">🗑️</span>
-            <span class="swcs-nav-label">Khác</span>
+        <a class="swcs-nav-item" href="{_page_link("profile")}" target="_top">
+            <span class="swcs-nav-icon">👤</span>
+            <span class="swcs-nav-label">Profile</span>
         </a>
+
     </div>
     """
 
 
-def _render_home_html(vm: dict) -> str:
+def _render_home_html(vm):
     avatar_src = _image_to_base64(vm["images"].get("avatar", ""))
 
     avatar_html = (
@@ -219,7 +207,7 @@ def _render_home_html(vm: dict) -> str:
 
     hero_subtitle = vm["hero"].get(
         "subtitle",
-        "Phân loại rác – thói quen của người văn minh",
+"Phân loại rác – thói quen của người văn minh",
     )
 
     hero_button_text = vm["hero"].get("button_text", "Bắt đầu hành trình")
@@ -295,7 +283,7 @@ def _render_home_html(vm: dict) -> str:
             </div>
 
             <div class="swcs-category-grid">
-                {categories_html}
+{categories_html}
             </div>
 
             <a href="{_page_link("home")}" target="_top" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
