@@ -13,11 +13,7 @@ from features.home.UI.view_plastic import render_plastic_page
 from features.home.UI.battery_view import render_battery_page
 from features.home.UI.nylon_view import render_nylon_page
 from features.home.UI.medical_view import render_medical_page
-
 from features.home.UI.AI.ai_viewPlastic import render_ai_page
-from features.home.UI.AI.ai_viewNylon import render_ai_nylon_page
-from features.home.UI.AI.ai_viewBattery import render_ai_battery_page
-from features.home.UI.AI.ai_viewMedical import render_ai_medical_page
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -28,8 +24,13 @@ REGISTER_FILE = BASE_DIR / "features" / "Login&Register" / "Register.py"
 
 def load_function_from_file(file_path, function_name):
     spec = importlib.util.spec_from_file_location(file_path.stem, file_path)
+
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Không thể load file: {file_path}")
+
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+
     return getattr(module, function_name)
 
 
@@ -46,9 +47,15 @@ VALID_PAGES = {
     "nylon",
     "medical",
     "ai",
-    "ai_nylon",
-    "ai_battery",
-    "ai_medical",
+}
+
+PROTECTED_PAGES = {
+    "home",
+    "plastic",
+    "battery",
+    "nylon",
+    "medical",
+    "ai",
 }
 
 
@@ -61,7 +68,25 @@ def configure_app():
     )
 
 
+def restore_login_from_query():
+    uid = st.query_params.get("uid")
+    uname = st.query_params.get("uname")
+
+    if isinstance(uid, list):
+        uid = uid[0]
+
+    if isinstance(uname, list):
+        uname = uname[0]
+
+    if uid and uname:
+        st.session_state["is_login"] = True
+        st.session_state["user_id"] = int(uid)
+        st.session_state["user_name"] = uname
+
+
 def get_current_page():
+    restore_login_from_query()
+
     current_page = st.query_params.get("page", "login")
 
     if isinstance(current_page, list):
@@ -69,6 +94,13 @@ def get_current_page():
 
     if current_page not in VALID_PAGES:
         current_page = "login"
+
+    is_login = st.session_state.get("is_login", False)
+
+    if current_page in PROTECTED_PAGES and not is_login:
+        current_page = "login"
+        st.query_params.clear()
+        st.query_params["page"] = "login"
 
     return current_page
 
@@ -83,14 +115,6 @@ def load_page_styles(page):
     elif page == "nylon":
         load_nylon_css()
     elif page == "medical":
-        load_medical_css()
-    elif page == "ai":
-        load_plastic_css()
-    elif page == "ai_nylon":
-        load_nylon_css()
-    elif page == "ai_battery":
-        load_battery_css()
-    elif page == "ai_medical":
         load_medical_css()
 
 
@@ -111,12 +135,6 @@ def render_page(page):
         render_medical_page()
     elif page == "ai":
         render_ai_page()
-    elif page == "ai_nylon":
-        render_ai_nylon_page()
-    elif page == "ai_battery":
-        render_ai_battery_page()
-    elif page == "ai_medical":
-        render_ai_medical_page()
     else:
         render_login_page()
 

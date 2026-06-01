@@ -1,18 +1,62 @@
 import base64
 from pathlib import Path
 from textwrap import dedent
+from urllib.parse import quote, unquote
+
 import streamlit as st
 
 from features.home.logic.home_service import get_home_data
+from features.home.logic.AI.ai_history_service import get_user_total_score
+
+
+def _restore_user_from_query():
+    uid = st.query_params.get("uid")
+    uname = st.query_params.get("uname")
+
+    if isinstance(uid, list):
+        uid = uid[0]
+
+    if isinstance(uname, list):
+        uname = uname[0]
+
+    if uid:
+        st.session_state["user_id"] = int(uid)
+        st.session_state["is_login"] = True
+
+    if uname:
+        st.session_state["user_name"] = unquote(str(uname))
+        st.session_state["is_login"] = True
+
+
+def _auth_query() -> str:
+    user_id = st.session_state.get("user_id")
+    user_name = st.session_state.get("user_name")
+
+    if user_id and user_name:
+        return f"&uid={user_id}&uname={quote(str(user_name))}"
+
+    return ""
+
+
+def _page_link(page: str) -> str:
+    return f"?page={page}{_auth_query()}"
 
 
 def load_home_view_model():
+    _restore_user_from_query()
+
     data = get_home_data()
+
+    user_id = st.session_state.get("user_id")
+    user_name = st.session_state.get("user_name", "Healing")
+
+    total_score = get_user_total_score(user_id) if user_id else 0
+    st.session_state["total_score"] = total_score
 
     return {
         "page_title": "SWCS",
-        "user_name": "Healing",
-        "points": "180 Point",
+        "user_name": user_name,
+        "points": f"{total_score} Point",
         "hero": data["hero"],
         "categories": data["categories"],
         "environment_messages": data["environment_messages"],
@@ -34,6 +78,7 @@ def _image_to_base64(image_path: str) -> str:
         return ""
 
     suffix = path.suffix.lower()
+
     mime_map = {
         ".png": "image/png",
         ".jpg": "image/jpeg",
@@ -82,12 +127,22 @@ def _category_color_class(index: int) -> str:
     return colors[index % len(colors)]
 
 
+def _fix_href(href: str) -> str:
+    href = str(href or "?page=home")
+    page = href.replace("?page=", "").split("&")[0]
+
+    if page:
+        return _page_link(page)
+
+    return _page_link("home")
+
+
 def _render_categories(categories: list[dict]) -> str:
     html = ""
 
     for index, item in enumerate(categories[:4]):
         title = item.get("title", "Loại rác")
-        href = item.get("href", "?page=home")
+        href = _fix_href(item.get("href", "?page=home"))
         code = item.get("code", "")
 
         icon = item.get("icon", "") or _category_icon_by_code(code)
@@ -106,19 +161,19 @@ def _render_categories(categories: list[dict]) -> str:
 
 
 def _render_bottom_nav() -> str:
-    return """
+    return f"""
     <div class="swcs-bottom-nav">
-        <a class="swcs-nav-item active" href="?page=home" target="_top">
+        <a class="swcs-nav-item active" href="{_page_link("home")}" target="_top">
             <span class="swcs-nav-icon">⌂</span>
             <span class="swcs-nav-label">Trang chủ</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=plastic" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("plastic")}" target="_top">
             <span class="swcs-nav-icon">♻️</span>
             <span class="swcs-nav-label">Tái Chế</span>
         </a>
 
-        <a class="swcs-scan-btn" href="?page=ai" target="_top" title="Quét camera">
+        <a class="swcs-scan-btn" href="{_page_link("ai")}" target="_top" title="Quét camera">
             <span class="swcs-scan-corner tl"></span>
             <span class="swcs-scan-corner tr"></span>
             <span class="swcs-scan-corner bl"></span>
@@ -126,12 +181,12 @@ def _render_bottom_nav() -> str:
             <span class="swcs-scan-dot"></span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=battery" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("battery")}" target="_top">
             <span class="swcs-nav-icon">☣️</span>
             <span class="swcs-nav-label">Nguy Hại</span>
         </a>
 
-        <a class="swcs-nav-item" href="?page=medical" target="_top">
+        <a class="swcs-nav-item" href="{_page_link("medical")}" target="_top">
             <span class="swcs-nav-icon">🗑️</span>
             <span class="swcs-nav-label">Khác</span>
         </a>
@@ -164,21 +219,21 @@ def _render_home_html(vm: dict) -> str:
 
     hero_subtitle = vm["hero"].get(
         "subtitle",
-        "Phân loại rác – thói quen của người văn minh"
+        "Phân loại rác – thói quen của người văn minh",
     )
 
     hero_button_text = vm["hero"].get("button_text", "Bắt đầu hành trình")
-    hero_button_href = vm["hero"].get("button_href", "?page=plastic")
+    hero_button_href = _fix_href(vm["hero"].get("button_href", "?page=plastic"))
 
     html = f"""
     <div class="swcs-page-bg">
         <section class="swcs-home-web-card">
 
             <div class="swcs-home-top">
-                <a href="?page=home" target="_top" class="swcs-menu-btn">☰</a>
+                <a href="{_page_link("home")}" target="_top" class="swcs-menu-btn">☰</a>
 
                 <div class="swcs-top-right">
-                    <a href="?page=home" target="_top" class="swcs-bell">
+                    <a href="{_page_link("home")}" target="_top" class="swcs-bell">
                         <span class="swcs-bell-dot"></span>
                         🔔
                     </a>
@@ -213,8 +268,13 @@ def _render_home_html(vm: dict) -> str:
                     <p>{hero_subtitle}</p>
 
                     <div class="swcs-hero-actions">
-                        <a href="{hero_button_href}" target="_top" class="swcs-start-btn">{hero_button_text}</a>
-                        <a href="?page=ai" target="_top" class="swcs-outline-btn">Quét bằng camera</a>
+                        <a href="{hero_button_href}" target="_top" class="swcs-start-btn">
+                            {hero_button_text}
+                        </a>
+
+                        <a href="{_page_link("ai")}" target="_top" class="swcs-outline-btn">
+                            Quét bằng camera
+                        </a>
                     </div>
                 </div>
 
@@ -231,14 +291,14 @@ def _render_home_html(vm: dict) -> str:
 
             <div class="swcs-section-head">
                 <div class="swcs-section-title">Rác Cần Phân Loại</div>
-                <a href="?page=plastic" target="_top" class="swcs-section-link">Tất cả</a>
+                <a href="{_page_link("plastic")}" target="_top" class="swcs-section-link">Tất cả</a>
             </div>
 
             <div class="swcs-category-grid">
                 {categories_html}
             </div>
 
-            <a href="?page=home" target="_top" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
+            <a href="{_page_link("home")}" target="_top" class="swcs-banner-card" style="background-image: url('{banner_bg}');">
                 <div class="swcs-banner-overlay">
                     <div class="swcs-banner-brand">Healing</div>
                     <div class="swcs-banner-title">Bảo vệ môi trường · Kiến tạo tương lai</div>
@@ -279,7 +339,7 @@ def _render_home_html(vm: dict) -> str:
 
             <div class="swcs-bottom-space"></div>
 
-            <a href="?page=home" target="_top" class="swcs-floating-recycle">♻</a>
+            <a href="{_page_link("home")}" target="_top" class="swcs-floating-recycle">♻</a>
 
             {_render_bottom_nav()}
         </section>

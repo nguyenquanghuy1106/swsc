@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
 import base64
+from urllib.parse import quote
 
 from features.database.connection import get_connection
 
@@ -39,7 +40,7 @@ def load_auth_style():
         {css}
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 
@@ -48,8 +49,12 @@ def login_user(user_name, password):
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute(
-        "SELECT * FROM Register WHERE userName = %s AND password = %s",
-        (user_name, password)
+        """
+        SELECT id, userName, phone
+        FROM register
+        WHERE userName = %s AND password = %s
+        """,
+        (user_name, password),
     )
 
     user = cursor.fetchone()
@@ -58,6 +63,19 @@ def login_user(user_name, password):
     conn.close()
 
     return user
+
+
+def set_login_session(user):
+    user_id = int(user["id"])
+    user_name = str(user["userName"])
+
+    st.session_state["is_login"] = True
+    st.session_state["user_id"] = user_id
+    st.session_state["user_name"] = user_name
+
+    st.query_params["page"] = "home"
+    st.query_params["uid"] = str(user_id)
+    st.query_params["uname"] = quote(user_name)
 
 
 def render_login_page():
@@ -81,23 +99,26 @@ def render_login_page():
                     </p>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with right:
-            st.markdown('<div class="form-title">Sign in</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="form-title">Sign in</div>',
+                unsafe_allow_html=True,
+            )
 
             user_name = st.text_input(
                 "Username",
                 placeholder="Tên đăng nhập",
-                label_visibility="collapsed"
+                label_visibility="collapsed",
             )
 
             password = st.text_input(
                 "Password",
                 placeholder="Mật khẩu",
                 type="password",
-                label_visibility="collapsed"
+                label_visibility="collapsed",
             )
 
             if st.button("Sign in"):
@@ -107,11 +128,7 @@ def render_login_page():
                     user = login_user(user_name, password)
 
                     if user:
-                        st.session_state["is_login"] = True
-                        st.session_state["user_id"] = user["id"]
-                        st.session_state["user_name"] = user["userName"]
-
-                        st.query_params["page"] = "home"
+                        set_login_session(user)
                         st.rerun()
                     else:
                         st.error("Sai tên đăng nhập hoặc mật khẩu")

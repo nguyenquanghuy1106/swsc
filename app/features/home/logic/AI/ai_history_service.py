@@ -1,72 +1,108 @@
-import streamlit as st
 from features.database.connection import get_connection
 
 
-def _get_login_user():
-    user_id = st.session_state.get("user_id")
-    user_name = st.session_state.get("user_name")
+WASTE_SAVE_MAP = {
+    "plastic": {"table": "recyclable_waste_history", "group": "RÁC TÁI CHẾ", "score": 2},
+    "paper": {"table": "recyclable_waste_history", "group": "RÁC TÁI CHẾ", "score": 2},
+    "cardboard": {"table": "recyclable_waste_history", "group": "RÁC TÁI CHẾ", "score": 2},
+    "glass": {"table": "recyclable_waste_history", "group": "RÁC TÁI CHẾ", "score": 2},
+    "metal": {"table": "recyclable_waste_history", "group": "RÁC TÁI CHẾ", "score": 2},
 
-    if user_id is None:
-        uid = st.query_params.get("uid")
-        if isinstance(uid, list):
-            uid = uid[0]
+    "biological": {"table": "organic_waste_history", "group": "RÁC HỮU CƠ", "score": 3},
 
-        if uid:
-            user_id = int(uid)
-            st.session_state["user_id"] = user_id
+    "clothes": {"table": "other_waste_history", "group": "RÁC KHÁC", "score": 4},
+    "shoes": {"table": "other_waste_history", "group": "RÁC KHÁC", "score": 4},
+    "trash": {"table": "other_waste_history", "group": "RÁC KHÁC", "score": 4},
 
-    if not user_name:
-        uname = st.query_params.get("uname")
-        if isinstance(uname, list):
-            uname = uname[0]
-
-        if uname:
-            user_name = uname
-            st.session_state["user_name"] = user_name
-
-    return user_id, user_name
+    "battery": {"table": "hazardous_waste_history", "group": "RÁC NGUY HẠI", "score": 5},
+}
 
 
-def save_ai_history(
-    user_id=None,
-    user_name=None,
-    waste_type=None,
-    predicted_class=None,
-    confidence=None,
-    image_name=None
-):
-    if user_id is None or not user_name:
-        user_id, user_name = _get_login_user()
+POINT_TABLES = [
+    "recyclable_waste_history",
+    "organic_waste_history",
+    "other_waste_history",
+    "hazardous_waste_history",
+]
 
-    if user_id is None or not user_name:
-        raise ValueError("Chưa có thông tin đăng nhập, không thể lưu lịch sử AI.")
+
+def normalize_class_name(name):
+    return str(name).strip().lower().replace(" ", "_")
+
+
+def get_user_total_score(user_id):
+    if not user_id:
+        return 0
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        INSERT INTO ai_history
+    total_score = 0
+
+    for table in POINT_TABLES:
+        cursor.execute(
+            f"SELECT COALESCE(SUM(score), 0) FROM {table} WHERE user_id = %s",
+            (user_id,),
+        )
+        total_score += int(cursor.fetchone()[0] or 0)
+
+    cursor.close()
+    conn.close()
+
+    return total_score
+
+
+def save_ai_scan_result(user_id, user_name, predicted_class, confidence, image_name=None):
+    waste_key = normalize_class_name(predicted_class)
+
+    if waste_key not in WASTE_SAVE_MAP:
+        return {
+            "success": False,
+            "message": f"Không tìm thấy nhóm rác cho loại: {predicted_class}",
+        }
+
+    info = WASTE_SAVE_MAP[waste_key]
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    sql = f"""
+        INSERT INTO {info["table"]}
         (
             user_id,
             user_name,
             waste_type,
-            predicted_class,
+            waste_group,
+            score,
             confidence,
             image_name
         )
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """,
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+
+    cursor.execute(
+        sql,
         (
             user_id,
             user_name,
-            waste_type,
-            predicted_class,
+            waste_key,
+            info["group"],
+            info["score"],
             confidence,
             image_name,
-        )
+        ),
     )
 
     conn.commit()
     cursor.close()
     conn.close()
+
+    total_score = get_user_total_score(user_id)
+
+    return {
+        "success": True,
+        "table": info["table"],
+        "group": info["group"],
+        "score": info["score"],
+        "total_score": total_score,
+    }
