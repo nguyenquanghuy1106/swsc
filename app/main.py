@@ -2,6 +2,8 @@ import streamlit as st
 import importlib.util
 from pathlib import Path
 
+from shared.styles.news_css import load_news_css
+from shared.styles.post_composer_css import load_post_composer_css
 from shared.styles.home_css import load_home_css
 from shared.styles.plastic_css import load_plastic_css
 from shared.styles.battery_css import load_battery_css
@@ -14,6 +16,8 @@ from features.home.UI.battery_view import render_battery_page
 from features.home.UI.nylon_view import render_nylon_page
 from features.home.UI.medical_view import render_medical_page
 from features.home.UI.AI.ai_viewPlastic import render_ai_page
+from features.home.UI.user.post_composer_view import render_post_composer_page
+from features.home.UI.user.news_view import render_news_page
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -47,15 +51,21 @@ VALID_PAGES = {
     "nylon",
     "medical",
     "ai",
+    "post",
+    "news",
 }
 
+
+# BỎ "ai" RA KHỎI PROTECTED_PAGES
+# Để bấm icon robot vẫn vào được trang AI
 PROTECTED_PAGES = {
     "home",
     "plastic",
     "battery",
     "nylon",
     "medical",
-    "ai",
+    "post",
+    "news",
 }
 
 
@@ -116,6 +126,10 @@ def load_page_styles(page):
         load_nylon_css()
     elif page == "medical":
         load_medical_css()
+    elif page == "post":
+        load_post_composer_css()
+    elif page == "news":
+        load_news_css()
 
 
 def render_page(page):
@@ -135,6 +149,10 @@ def render_page(page):
         render_medical_page()
     elif page == "ai":
         render_ai_page()
+    elif page == "post":
+        render_post_composer_page()
+    elif page == "news":
+        render_news_page()
     else:
         render_login_page()
 

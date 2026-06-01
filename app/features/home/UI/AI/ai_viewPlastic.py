@@ -4,6 +4,7 @@ import html
 from urllib.parse import unquote
 
 from shared.styles.ai_css import load_ai_css
+from features.database.connection import get_connection
 from features.home.logic.AI.ai_servicePlastic import predict_waste_image
 from features.home.logic.AI.ai_history_service import save_ai_scan_result
 
@@ -112,9 +113,49 @@ def restore_user_from_query():
         st.session_state["is_login"] = True
 
 
+def restore_user_from_current_login():
+    """
+    Nếu URL không có uid/uname thì lấy user đăng nhập mới nhất
+    trong bảng current_login.
+    """
+    if st.session_state.get("user_id") and st.session_state.get("user_name"):
+        return
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT user_id, userName
+            FROM current_login
+            WHERE id = 1
+            LIMIT 1
+            """
+        )
+
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if user:
+            st.session_state["is_login"] = True
+            st.session_state["user_id"] = int(user["user_id"])
+            st.session_state["user_name"] = str(user["userName"])
+
+    except Exception:
+        pass
+
+
 def get_logged_user():
     restore_user_from_query()
-    return st.session_state.get("user_id"), st.session_state.get("user_name")
+    restore_user_from_current_login()
+
+    return (
+        st.session_state.get("user_id"),
+        st.session_state.get("user_name"),
+    )
 
 
 def render_result_card(
@@ -218,7 +259,8 @@ def render_group_card(group_icon, group_name):
 
 def render_ai_page():
     load_ai_css()
-    restore_user_from_query()
+
+    user_id, user_name = get_logged_user()
 
     st.markdown(
         """
@@ -228,6 +270,11 @@ def render_ai_page():
         """,
         unsafe_allow_html=True,
     )
+
+    if user_id and user_name:
+        st.success(f"Đang đăng nhập: {user_name} - ID: {user_id}")
+    else:
+        st.warning("Chưa đăng nhập nên kết quả sẽ không được lưu vào database.")
 
     col_left, col_right = st.columns([1, 1.45])
 
@@ -301,7 +348,7 @@ def render_ai_page():
                 image_name=uploaded_file.name,
             )
 
-            if save_result["success"]:
+            if save_result.get("success"):
                 st.session_state["total_score"] = save_result["total_score"]
 
                 st.success(
@@ -310,7 +357,7 @@ def render_ai_page():
                     f"Tổng điểm hiện tại: {save_result['total_score']} Point."
                 )
             else:
-                st.warning(save_result["message"])
+                st.warning(save_result.get("message", "Không lưu được kết quả."))
 
         except Exception as e:
             st.error(f"Lỗi khi lưu database: {e}")
