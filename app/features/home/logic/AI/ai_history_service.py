@@ -83,12 +83,12 @@ def save_ai_scan_result(user_id, user_name, predicted_class, confidence, image_n
     cursor.execute(
         sql,
         (
-            user_id,
-            user_name,
+            int(user_id),
+            str(user_name),
             waste_key,
             info["group"],
             info["score"],
-            confidence,
+            round(float(confidence), 2),
             image_name,
         ),
     )
