@@ -641,5 +641,79 @@ div[data-testid="stButton"] > button {
     text-decoration: none !important;
     filter: brightness(1.05);
 }
+                .swcs-bottom-nav {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 18px !important;
+    transform: translateX(-50%) !important;
+
+    width: min(560px, calc(100% - 24px)) !important;
+    height: 72px !important;
+
+    background: rgba(255,255,255,.96) !important;
+    border: 1.5px solid #a6d995 !important;
+    border-radius: 28px !important;
+    box-shadow: 0 10px 32px rgba(47,125,50,.25) !important;
+    backdrop-filter: blur(14px) !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 90px 1fr 1fr !important;
+    align-items: center !important;
+    justify-items: center !important;
+
+    z-index: 9999 !important;
+}
+
+.swcs-nav-item {
+    width: 100% !important;
+    height: 58px !important;
+    text-decoration: none !important;
+    color: #4a4a4a !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 4px !important;
+    font-size: 13px !important;
+    font-weight: 850 !important;
+    white-space: nowrap !important;
+}
+
+.swcs-nav-item:hover {
+    transform: translateY(-3px) !important;
+}
+
+.swcs-nav-icon {
+    font-size: 24px !important;
+    line-height: 1 !important;
+}
+
+.swcs-nav-label {
+    font-size: 13px !important;
+    line-height: 1 !important;
+}
+
+.swcs-scan-btn {
+    width: 74px !important;
+    height: 74px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg,#42c96f,#1aa6a6) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin-top: -36px !important;
+    border: 5px solid #fff !important;
+    box-shadow: 0 8px 24px rgba(26,166,166,.42) !important;
+    text-decoration: none !important;
+}
+
+.swcs-nav-ai {
+    font-size: 32px !important;
+    line-height: 1 !important;
+}
 </style>
 """, unsafe_allow_html=True)

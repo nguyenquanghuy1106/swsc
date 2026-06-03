@@ -65,7 +65,7 @@ def _render_bottom_nav() -> str:
         '<div class="swcs-bottom-nav">'
         f'<a class="swcs-nav-item" href="{_page_url("home")}" target="_top"><span class="swcs-nav-icon">🏠</span><span class="swcs-nav-label">Trang chủ</span></a>'
         f'<a class="swcs-nav-item active" href="{_page_url("post")}" target="_top"><span class="swcs-nav-icon">📚</span><span class="swcs-nav-label">Bài đăng</span></a>'
-        f'<a class="swcs-scan-btn" href="{_page_url("ai")}" target="_top"><span class="swcs-nav-ai">🤖</span></a>'
+        f'<a class="swcs-scan-btn" href="{_page_url("camera")}" target="_top"><span class="swcs-nav-ai">🤖</span></a>'
         f'<a class="swcs-nav-item" href="{_page_url("news")}" target="_top"><span class="swcs-nav-icon">📰</span><span class="swcs-nav-label">Tin tức</span></a>'
         f'<a class="swcs-nav-item" href="{_page_url("profile")}" target="_top"><span class="swcs-nav-icon">👤</span><span class="swcs-nav-label">Profile</span></a>'
         "</div>"

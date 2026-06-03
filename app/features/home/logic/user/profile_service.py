@@ -29,6 +29,19 @@ def get_current_login_user():
     return user
 
 
+def logout_current_user():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM current_login WHERE id = 1")
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {"success": True, "message": "Đăng xuất thành công!"}
+
+
 def get_user_by_id(user_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -63,7 +76,6 @@ def get_total_score(user_id):
 
     total_score = 0
     total_scans = 0
-    total_weight = 0
 
     for table in tables:
         cursor.execute(
@@ -100,6 +112,7 @@ def get_user_posts(user_id):
         SELECT id, title, category, content, image_path, status, created_at
         FROM posts
         WHERE user_id = %s
+        AND status != 'deleted'
         ORDER BY created_at DESC
         """,
         (user_id,),
@@ -121,7 +134,8 @@ def count_user_posts(user_id):
         """
         SELECT
             SUM(CASE WHEN status = 'posted' THEN 1 ELSE 0 END) AS posted_count,
-            SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) AS draft_count
+            SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) AS draft_count,
+            SUM(CASE WHEN status = 'hidden' THEN 1 ELSE 0 END) AS hidden_count
         FROM posts
         WHERE user_id = %s
         """,
@@ -136,7 +150,86 @@ def count_user_posts(user_id):
     return {
         "posted_count": int(row["posted_count"] or 0),
         "draft_count": int(row["draft_count"] or 0),
+        "hidden_count": int(row["hidden_count"] or 0),
     }
+
+
+def hide_post(post_id, user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE posts
+        SET status = 'hidden'
+        WHERE id = %s AND user_id = %s
+        """,
+        (post_id, user_id),
+    )
+
+    conn.commit()
+    affected = cursor.rowcount
+
+    cursor.close()
+    conn.close()
+
+    if affected == 0:
+        return {"success": False, "message": "Không tìm thấy bài viết để ẩn."}
+
+    return {"success": True, "message": "Đã ẩn bài viết khỏi trang Tin tức."}
+
+
+def restore_post(post_id, user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE posts
+        SET status = 'posted'
+        WHERE id = %s AND user_id = %s
+        """,
+        (post_id, user_id),
+    )
+
+    conn.commit()
+    affected = cursor.rowcount
+
+    cursor.close()
+    conn.close()
+
+    if affected == 0:
+        return {"success": False, "message": "Không tìm thấy bài viết để hiện lại."}
+
+    return {"success": True, "message": "Đã hiện lại bài viết trên trang Tin tức."}
+
+
+def delete_post(post_id, user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM post_likes WHERE post_id = %s", (post_id,))
+    cursor.execute("DELETE FROM post_comments WHERE post_id = %s", (post_id,))
+
+    cursor.execute(
+        """
+        UPDATE posts
+        SET status = 'deleted'
+        WHERE id = %s AND user_id = %s
+        """,
+        (post_id, user_id),
+    )
+
+    conn.commit()
+    affected = cursor.rowcount
+
+    cursor.close()
+    conn.close()
+
+    if affected == 0:
+        return {"success": False, "message": "Không tìm thấy bài viết để xóa."}
+
+    return {"success": True, "message": "Đã xóa bài viết khỏi hệ thống."}
 
 
 def update_password(user_id, old_password, new_password):

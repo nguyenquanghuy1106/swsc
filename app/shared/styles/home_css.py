@@ -788,5 +788,171 @@ def load_home_css():
             font-size: 26px;
         }
     }
+    .swcs-bottom-nav {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 18px !important;
+    transform: translateX(-50%) !important;
+    width: min(560px, calc(100% - 24px)) !important;
+    height: 72px !important;
+    padding: 0 !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 1.5px solid #a6d995 !important;
+    border-radius: 28px !important;
+    box-shadow: 0 10px 32px rgba(47, 125, 50, 0.25) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    z-index: 9999 !important;
+    backdrop-filter: blur(14px) !important;
+}
+
+.swcs-nav-item {
+    text-decoration: none !important;
+    color: #4a4a4a !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    gap: 3px !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    transition: .25s ease !important;
+}
+
+.swcs-nav-item.active {
+    color: #2e7d32 !important;
+    background: transparent !important;
+}
+
+.swcs-nav-item:hover {
+    transform: translateY(-3px) !important;
+    background: transparent !important;
+}
+
+.swcs-nav-icon {
+    font-size: 22px !important;
+}
+
+.swcs-nav-label {
+    display: block !important;
+    font-size: 13px !important;
+}
+
+.swcs-scan-btn {
+    width: 68px !important;
+    height: 68px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #42c96f, #1aa6a6) !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    margin-top: -34px !important;
+    box-shadow: 0 8px 24px rgba(26, 166, 166, 0.42) !important;
+    border: 5px solid white !important;
+    animation: swcsPulse 1.8s infinite !important;
+}
+
+.swcs-nav-ai {
+    font-size: 31px !important;
+}
+
+@keyframes swcsPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(36, 170, 163, 0.45);
+    }
+    70% {
+        box-shadow: 0 0 0 16px rgba(36, 170, 163, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(36, 170, 163, 0);
+    }
+}
+    .swcs-bottom-nav {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 18px !important;
+    transform: translateX(-50%) !important;
+    width: min(560px, calc(100% - 24px)) !important;
+    height: 72px !important;
+    padding: 0 18px !important;
+
+    background: rgba(255,255,255,.96) !important;
+    border: 1.5px solid #a6d995 !important;
+    border-radius: 28px !important;
+    box-shadow: 0 10px 32px rgba(47,125,50,.25) !important;
+    backdrop-filter: blur(14px) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    z-index: 9999 !important;
+}
+
+.swcs-nav-item {
+    width: 100% !important;
+    height: 58px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 4px !important;
+
+    color: #4a4a4a !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    background: transparent !important;
+    border-radius: 18px !important;
+}
+
+.swcs-nav-item.active {
+    color: #2e7d32 !important;
+}
+
+.swcs-nav-item:hover {
+    transform: translateY(-3px) !important;
+}
+
+.swcs-nav-icon {
+    font-size: 24px !important;
+    line-height: 1 !important;
+}
+
+.swcs-nav-label {
+    display: block !important;
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+}
+
+.swcs-scan-btn {
+    width: 72px !important;
+    height: 72px !important;
+
+    border-radius: 50% !important;
+    background: linear-gradient(135deg,#42c96f,#1aa6a6) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin-top: -36px !important;
+
+    border: 5px solid #fff !important;
+    box-shadow: 0 8px 24px rgba(26,166,166,.42) !important;
+}
+
+.swcs-nav-ai {
+    font-size: 31px !important;
+    line-height: 1 !important;
+}
     </style>
     """, unsafe_allow_html=True)
