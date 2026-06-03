@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import html
-from urllib.parse import unquote
+from urllib.parse import unquote, quote
 
 from shared.styles.ai_css import load_ai_css
 from features.database.connection import get_connection
@@ -73,6 +73,32 @@ GROUP_MAP = {
 }
 
 
+def _clean_html(html_text: str) -> str:
+    return "".join(line.strip() for line in html_text.splitlines() if line.strip())
+
+
+def _page_url(page):
+    user_id = st.session_state.get("user_id")
+    user_name = st.session_state.get("user_name")
+
+    if user_id and user_name:
+        return f"?page={page}&uid={user_id}&uname={quote(str(user_name))}"
+
+    return f"?page={page}"
+
+
+def _render_bottom_nav():
+    return (
+        '<div class="swcs-bottom-nav">'
+        f'<a class="swcs-nav-item" href="{_page_url("home")}" target="_top"><span class="swcs-nav-icon">🏠</span><span class="swcs-nav-label">Trang chủ</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("post")}" target="_top"><span class="swcs-nav-icon">📚</span><span class="swcs-nav-label">Bài đăng</span></a>'
+        f'<a class="swcs-scan-btn" href="{_page_url("ai")}" target="_top" title="AI nhận diện"><span class="swcs-nav-ai">🤖</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("news")}" target="_top"><span class="swcs-nav-icon">📰</span><span class="swcs-nav-label">Tin tức</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("profile")}" target="_top"><span class="swcs-nav-icon">👤</span><span class="swcs-nav-label">Profile</span></a>'
+        "</div>"
+    )
+
+
 def normalize_class_name(name):
     return str(name).strip().lower().replace(" ", "_")
 
@@ -114,10 +140,6 @@ def restore_user_from_query():
 
 
 def restore_user_from_current_login():
-    """
-    Nếu URL không có uid/uname thì lấy user đăng nhập mới nhất
-    trong bảng current_login.
-    """
     if st.session_state.get("user_id") and st.session_state.get("user_name"):
         return
 
@@ -158,14 +180,7 @@ def get_logged_user():
     )
 
 
-def render_result_card(
-    display_name,
-    confidence,
-    predicted_class,
-    group_name,
-    group_desc,
-    group_action,
-):
+def render_result_card(display_name, confidence, predicted_class, group_name, group_desc, group_action):
     display_name = html.escape(str(display_name))
     confidence = html.escape(str(confidence))
     predicted_class = html.escape(str(predicted_class).upper())
@@ -175,43 +190,16 @@ def render_result_card(
 
     st.html(
         f"""
-        <div style="
-            background:#ffffff;
-            border-radius:22px;
-            padding:34px;
-            box-shadow:0 12px 32px rgba(0,0,0,0.14);
-            min-height:420px;
-            font-family:Arial, sans-serif;
-        ">
-            <div style="
-                font-size:31px;
-                font-weight:950;
-                color:#111;
-                margin-bottom:24px;
-                line-height:1.3;
-            ">
+        <div style="background:#ffffff;border-radius:22px;padding:34px;box-shadow:0 12px 32px rgba(0,0,0,0.14);min-height:420px;font-family:Arial,sans-serif;">
+            <div style="font-size:31px;font-weight:950;color:#111;margin-bottom:24px;line-height:1.3;">
                 🎯 NHẬN DIỆN: {display_name} ({confidence}%)
             </div>
 
-            <div style="
-                background:linear-gradient(135deg,#15a646,#22c55e);
-                color:white;
-                padding:19px 20px;
-                border-radius:16px;
-                font-size:29px;
-                font-weight:950;
-                margin-bottom:26px;
-                text-align:center;
-            ">
+            <div style="background:linear-gradient(135deg,#15a646,#22c55e);color:white;padding:19px 20px;border-radius:16px;font-size:29px;font-weight:950;margin-bottom:26px;text-align:center;">
                 LOẠI RÁC: {predicted_class}
             </div>
 
-            <div style="
-                color:#101010;
-                font-size:23px;
-                line-height:1.85;
-                font-weight:650;
-            ">
+            <div style="color:#101010;font-size:23px;line-height:1.85;font-weight:650;">
                 <b>📂 Thuộc nhóm:</b> {group_name}<br>
                 <b>📝 Mô tả:</b> {group_desc}<br>
                 <b>♻️ Hành động:</b> {group_action}
@@ -227,31 +215,9 @@ def render_group_card(group_icon, group_name):
 
     st.html(
         f"""
-        <div style="
-            background:#ffffff;
-            border-radius:22px;
-            padding:42px 24px;
-            box-shadow:0 12px 32px rgba(0,0,0,0.14);
-            text-align:center;
-            min-height:420px;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            font-family:Arial, sans-serif;
-        ">
-            <div style="font-size:125px; margin-bottom:28px; line-height:1;">
-                {group_icon}
-            </div>
-
-            <div style="
-                font-size:42px;
-                font-weight:950;
-                color:#0b0b0b;
-                line-height:1.2;
-            ">
-                {group_name}
-            </div>
+        <div style="background:#ffffff;border-radius:22px;padding:42px 24px;box-shadow:0 12px 32px rgba(0,0,0,0.14);text-align:center;min-height:420px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:Arial,sans-serif;">
+            <div style="font-size:125px;margin-bottom:28px;line-height:1;">{group_icon}</div>
+            <div style="font-size:42px;font-weight:950;color:#0b0b0b;line-height:1.2;">{group_name}</div>
         </div>
         """
     )
@@ -263,16 +229,22 @@ def render_ai_page():
     user_id, user_name = get_logged_user()
 
     st.markdown(
-        """
-<div class="hero-title">
-    PHÂN LOẠI RÁC THẢI THÔNG MINH - CHỈ VỚI MỘT BỨC ẢNH
-</div>
-        """,
+        _clean_html(
+            """
+            <div class="hero-title">
+                🤖 PHÂN LOẠI RÁC THẢI THÔNG MINH
+                <div class="hero-subtitle">Tải ảnh lên để AI nhận diện loại rác và tự động lưu kết quả phân loại</div>
+            </div>
+            """
+        ),
         unsafe_allow_html=True,
     )
 
     if user_id and user_name:
-        st.success(f"Đang đăng nhập: {user_name} - ID: {user_id}")
+        st.markdown(
+            f'<div class="login-status">👤 Đang đăng nhập: <b>{user_name}</b> | ID: <b>{user_id}</b></div>',
+            unsafe_allow_html=True,
+        )
     else:
         st.warning("Chưa đăng nhập nên kết quả sẽ không được lưu vào database.")
 
@@ -280,24 +252,30 @@ def render_ai_page():
 
     with col_left:
         st.markdown(
-            """
-<div style="text-align:center; padding-top:35px;">
-    <div style="font-size:105px;">👨‍👩‍👧‍👦</div>
-    <div style="font-size:82px;">🗑️♻️🗑️</div>
-</div>
-            """,
+            _clean_html(
+                """
+                <div class="ai-illustration-card">
+                    <div class="ai-illustration-main">🌍</div>
+                    <div class="ai-illustration-icons">🧴 📄 🔋 🍃 🥫</div>
+                    <h3>SWSC AI Waste Sorting</h3>
+                    <p>Hỗ trợ phân loại rác tái chế, hữu cơ, nguy hại và rác khác.</p>
+                </div>
+                """
+            ),
             unsafe_allow_html=True,
         )
 
     with col_right:
         st.markdown(
-            """
-<div class="upload-box">
-    <div class="upload-title">TẢI ẢNH LÊN ĐỂ PHÂN LOẠI</div>
-    <div class="upload-icon">☁️</div>
-    <div class="upload-text">Kéo thả ảnh hoặc click để chọn tệp</div>
-</div>
-            """,
+            _clean_html(
+                """
+                <div class="upload-box">
+                    <div class="upload-title">TẢI ẢNH LÊN ĐỂ PHÂN LOẠI</div>
+                    <div class="upload-icon">☁️♻️</div>
+                    <div class="upload-text">Kéo thả ảnh hoặc click để chọn tệp</div>
+                </div>
+                """
+            ),
             unsafe_allow_html=True,
         )
 
@@ -308,11 +286,13 @@ def render_ai_page():
         )
 
     if uploaded_file is None:
+        st.markdown(_render_bottom_nav(), unsafe_allow_html=True)
         return
 
     image = Image.open(uploaded_file).convert("RGB")
 
     if not st.button("🔍 Nhận diện và lưu kết quả", use_container_width=True):
+        st.markdown(_render_bottom_nav(), unsafe_allow_html=True)
         return
 
     try:
@@ -329,6 +309,7 @@ def render_ai_page():
 
     except Exception as e:
         st.error(f"Lỗi khi nhận diện: {e}")
+        st.markdown(_render_bottom_nav(), unsafe_allow_html=True)
         return
 
     group_name = group_info.get("group", "CHƯA XÁC ĐỊNH")
@@ -396,3 +377,5 @@ def render_ai_page():
             group_icon=group_icon,
             group_name=group_name,
         )
+
+    st.markdown(_render_bottom_nav(), unsafe_allow_html=True)

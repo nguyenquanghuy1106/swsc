@@ -1,18 +1,38 @@
 import base64
 from pathlib import Path
+from urllib.parse import quote
 
 import streamlit as st
 from features.home.logic.plastic_service import get_plastic_data
+
+
+def _page_url(page):
+    user_id = st.session_state.get("user_id")
+    user_name = st.session_state.get("user_name")
+
+    if user_id and user_name:
+        return f"?page={page}&uid={user_id}&uname={quote(str(user_name))}"
+
+    return f"?page={page}"
+
+
+def _render_bottom_nav():
+    return (
+        '<div class="swcs-bottom-nav">'
+        f'<a class="swcs-nav-item" href="{_page_url("home")}" target="_top"><span class="swcs-nav-icon">🏠</span><span class="swcs-nav-label">Trang chủ</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("post")}" target="_top"><span class="swcs-nav-icon">📚</span><span class="swcs-nav-label">Bài đăng</span></a>'
+        f'<a class="swcs-scan-btn" href="{_page_url("ai")}" target="_top"><span class="swcs-nav-ai">🤖</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("news")}" target="_top"><span class="swcs-nav-icon">📰</span><span class="swcs-nav-label">Tin tức</span></a>'
+        f'<a class="swcs-nav-item" href="{_page_url("profile")}" target="_top"><span class="swcs-nav-icon">👤</span><span class="swcs-nav-label">Profile</span></a>'
+        "</div>"
+    )
 
 
 def load_plastic_view_model():
     data = get_plastic_data()
     return {
         "page_title": "Phân loại rác thải nhựa",
-        "hero_desc": (
-            "Hệ thống hỗ trợ nhận biết vật liệu nhựa, "
-            "thời gian phân hủy và định hướng xử lý phù hợp."
-        ),
+        "hero_desc": "Hệ thống hỗ trợ nhận biết vật liệu nhựa, thời gian phân hủy và định hướng xử lý phù hợp.",
         "categories": data["categories"],
         "summary_items": data["summary_items"],
         "environment_notes": data["environment_notes"],
@@ -34,12 +54,11 @@ def _image_to_base64(image_path: str) -> str:
         ".jpeg": "image/jpeg",
         ".webp": "image/webp",
     }
-    mime_type = mime_map.get(suffix, "image/png")
 
     with open(path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode("utf-8")
 
-    return f"data:{mime_type};base64,{encoded}"
+    return f"data:{mime_map.get(suffix, 'image/png')};base64,{encoded}"
 
 
 def _get_bar_gradient(bar_class: str) -> str:
@@ -74,21 +93,19 @@ def _get_bar_width(years: str) -> str:
 def _render_sidebar():
     sidebar_html = (
         '<div class="plastic-sidebar-wrapper">'
-        '  <input type="checkbox" id="plasticSidebarToggle" class="plastic-sidebar-checkbox">'
-        '  <label for="plasticSidebarToggle" class="plastic-sidebar-toggle">☰</label>'
-        '  <label for="plasticSidebarToggle" class="plastic-sidebar-overlay"></label>'
-        '  <div class="plastic-sidebar">'
-        '    <div class="plastic-logo">♻ SWCS</div>'
-        '    <div class="plastic-menu">'
-        '      <div class="plastic-menu-item">🏠 Tổng quan</div>'
-        '      <div class="plastic-menu-item active">🗂️ Phân loại rác</div>'
-        '      <div class="plastic-menu-item">📷 Nhận diện rác</div>'
-        '      <div class="plastic-menu-item">📍 Kiến thức tái chế</div>'
-        '      <div class="plastic-menu-item">📊 Thống kê</div>'
-        '      <div class="plastic-menu-item">⚙️ Cài đặt</div>'
-        '    </div>'
-        '  </div>'
-        '</div>'
+        '<input type="checkbox" id="plasticSidebarToggle" class="plastic-sidebar-checkbox">'
+        '<label for="plasticSidebarToggle" class="plastic-sidebar-toggle">☰</label>'
+        '<label for="plasticSidebarToggle" class="plastic-sidebar-overlay"></label>'
+        '<div class="plastic-sidebar">'
+        '<div class="plastic-logo">♻ SWCS</div>'
+        '<div class="plastic-menu">'
+        '<div class="plastic-menu-item">🏠 Tổng quan</div>'
+        '<div class="plastic-menu-item active">🗂️ Phân loại rác</div>'
+        '<div class="plastic-menu-item">📷 Nhận diện rác</div>'
+        '<div class="plastic-menu-item">📍 Kiến thức tái chế</div>'
+        '<div class="plastic-menu-item">📊 Thống kê</div>'
+        '<div class="plastic-menu-item">⚙️ Cài đặt</div>'
+        '</div></div></div>'
     )
     st.markdown(sidebar_html, unsafe_allow_html=True)
 
@@ -96,34 +113,25 @@ def _render_sidebar():
 def _render_top_bar():
     topbar_html = (
         '<div class="plastic-topbar">'
-        '  <div class="plastic-topbar-title">Phân loại rác thải nhựa</div>'
-        '  <div class="plastic-topbar-right">'
-        '    <div class="plastic-topbar-search-mini">🔍 Tìm kiếm</div>'
-        '    <div class="plastic-topbar-icon-wrap">'
-        '      <div class="plastic-topbar-badge">3</div>'
-        '      <div class="plastic-topbar-icon">🔔</div>'
-        '    </div>'
-        '    <div class="plastic-topbar-icon-wrap">'
-        '      <div class="plastic-topbar-badge">1</div>'
-        '      <div class="plastic-topbar-icon">📩</div>'
-        '    </div>'
-        '    <div class="plastic-topbar-avatar">👨🏻</div>'
-        '  </div>'
-        '</div>'
+        '<div class="plastic-topbar-title">Phân loại rác thải nhựa</div>'
+        '<div class="plastic-topbar-right">'
+        '<div class="plastic-topbar-search-mini">🔍 Tìm kiếm</div>'
+        '<div class="plastic-topbar-icon-wrap"><div class="plastic-topbar-badge">3</div><div class="plastic-topbar-icon">🔔</div></div>'
+        '<div class="plastic-topbar-icon-wrap"><div class="plastic-topbar-badge">1</div><div class="plastic-topbar-icon">📩</div></div>'
+        '<div class="plastic-topbar-avatar">👨🏻</div>'
+        '</div></div>'
     )
     st.markdown(topbar_html, unsafe_allow_html=True)
 
 
 def _render_banner_search():
-    search_html = (
+    st.markdown(
         '<div class="plastic-banner-search">'
-        '  <span class="plastic-banner-search-icon">🔍</span>'
-        '  <span class="plastic-banner-search-text">'
-        '    Tìm loại rác, vật liệu, thời gian phân hủy...'
-        '  </span>'
-        '</div>'
+        '<span class="plastic-banner-search-icon">🔍</span>'
+        '<span class="plastic-banner-search-text">Tìm loại rác, vật liệu, thời gian phân hủy...</span>'
+        '</div>',
+        unsafe_allow_html=True,
     )
-    st.markdown(search_html, unsafe_allow_html=True)
 
 
 def _render_hero():
@@ -144,20 +152,14 @@ def _render_hero():
 
     hero_html = (
         '<div class="plastic-hero-banner">'
-        '  <div class="plastic-hero-left">'
-        '    <div class="plastic-hero-big-title">'
-        '      Khám phá các loại rác<br>thải nhựa phổ biến'
-        '    </div>'
-        '    <div class="plastic-hero-big-desc">'
-        '      Hệ thống hỗ trợ nhận biết vật liệu nhựa,<br>'
-        '      thời gian phân hủy và định hướng xử lý phù hợp.'
-        '    </div>'
-        '    <div class="plastic-hero-actions">'
-        '      <div class="plastic-hero-btn primary">Xem danh mục</div>'
-        '      <div class="plastic-hero-btn secondary">Tìm hiểu về rác đặc biệt</div>'
-        '    </div>'
-        '  </div>'
-        f'  {right_html}'
+        '<div class="plastic-hero-left">'
+        '<div class="plastic-hero-big-title">Khám phá các loại rác<br>thải nhựa phổ biến</div>'
+        '<div class="plastic-hero-big-desc">Hệ thống hỗ trợ nhận biết vật liệu nhựa,<br>thời gian phân hủy và định hướng xử lý phù hợp.</div>'
+        '<div class="plastic-hero-actions">'
+        '<div class="plastic-hero-btn primary">Xem danh mục</div>'
+        '<div class="plastic-hero-btn secondary">Tìm hiểu về rác đặc biệt</div>'
+        '</div></div>'
+        f'{right_html}'
         '</div>'
     )
 
@@ -184,21 +186,19 @@ def _render_card(item: dict):
 
     card_html = (
         f'<div class="plastic-card">'
-        f'  <div class="plastic-card-head">'
-        f'    <div class="plastic-card-title">♻ {item["code"]}</div>'
-        f'    <div class="plastic-card-badge">{item["number"]}</div>'
-        f'  </div>'
-        f'  {media_html}'
-        f'  <div class="plastic-card-years">{item["years"]}</div>'
-        f'  <div class="plastic-progress">'
-        f'    <div class="plastic-progress-fill" '
-        f'         style="width:{bar_width}; background:{bar_gradient};"></div>'
-        f'  </div>'
-        f'  <div class="plastic-card-desc">{item["description"]}</div>'
-        f'  <div class="plastic-card-button-row">'
-        f'    <button class="plastic-card-detail-btn" disabled>Chi tiết</button>'
-        f'  </div>'
+        f'<div class="plastic-card-head">'
+        f'<div class="plastic-card-title">♻ {item["code"]}</div>'
+        f'<div class="plastic-card-badge">{item["number"]}</div>'
         f'</div>'
+        f'{media_html}'
+        f'<div class="plastic-card-years">{item["years"]}</div>'
+        f'<div class="plastic-progress">'
+        f'<div class="plastic-progress-fill" style="width:{bar_width}; background:{bar_gradient};"></div>'
+        f'</div>'
+        f'<div class="plastic-card-desc">{item["description"]}</div>'
+        f'<div class="plastic-card-button-row">'
+        f'<button class="plastic-card-detail-btn" disabled>Chi tiết</button>'
+        f'</div></div>'
     )
 
     st.markdown(card_html, unsafe_allow_html=True)
@@ -206,31 +206,27 @@ def _render_card(item: dict):
 
 def _render_info_box(title: str, items: list[str]):
     list_html = "".join(f"<li>{x}</li>" for x in items)
-    info_html = (
+    st.markdown(
         f'<div class="plastic-info-box">'
-        f'  <div class="plastic-info-title">{title}</div>'
-        f'  <ul class="plastic-list">{list_html}</ul>'
-        f'</div>'
+        f'<div class="plastic-info-title">{title}</div>'
+        f'<ul class="plastic-list">{list_html}</ul>'
+        f'</div>',
+        unsafe_allow_html=True,
     )
-    st.markdown(info_html, unsafe_allow_html=True)
 
 
 def _render_bottom_actions():
     action_html = (
         '<div class="plastic-action-grid">'
-        '  <div class="plastic-action-card">'
-        '    <button class="plastic-action-btn red" disabled>🔋 Tìm hiểu về Nhựa</button>'
-        '  </div>'
-
-        '  <div class="plastic-action-card">'
-        '    <button class="plastic-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
-        '  </div>'
-
-        '  <div class="plastic-action-card">'
-        '    <a href="?page=ai" class="plastic-action-btn blue plastic-ai-link">'
-        '      🤖 Nhận diện rác bằng AI'
-        '    </a>'
-        '  </div>'
+        '<div class="plastic-action-card">'
+        '<button class="plastic-action-btn red" disabled>🔋 Tìm hiểu về Nhựa</button>'
+        '</div>'
+        '<div class="plastic-action-card">'
+        '<button class="plastic-action-btn green" disabled>♻ Hướng dẫn phân loại</button>'
+        '</div>'
+        '<div class="plastic-action-card">'
+        f'<a href="{_page_url("ai")}" class="plastic-action-btn blue plastic-ai-link">🤖 Nhận diện rác bằng AI</a>'
+        '</div>'
         '</div>'
     )
 
@@ -253,7 +249,7 @@ def render_plastic_page():
 
         st.markdown(
             '<div class="plastic-section-title">Các loại nhựa phổ biến</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
         row1 = st.columns(3, gap="medium")
@@ -261,8 +257,7 @@ def render_plastic_page():
 
         for i, item in enumerate(vm["categories"]):
             cols = row1 if i < 3 else row2
-            col = cols[i % 3]
-            with col:
+            with cols[i % 3]:
                 _render_card(item)
 
         st.markdown('<div class="plastic-space-16"></div>', unsafe_allow_html=True)
@@ -287,7 +282,7 @@ def render_plastic_page():
                 st.query_params["page"] = "home"
                 st.rerun()
 
-        st.markdown(
-            '<div class="plastic-note"></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<div class="plastic-note"></div>', unsafe_allow_html=True)
+
+    st.markdown("<br><br><br><br>", unsafe_allow_html=True)
+    st.markdown(_render_bottom_nav(), unsafe_allow_html=True)

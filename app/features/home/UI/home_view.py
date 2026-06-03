@@ -165,7 +165,7 @@ def _render_bottom_nav() -> str:
         </a>
 
         <a class="swcs-scan-btn" href="{_page_link("camera")}" target="_top" title="Quét camera">
-            <span class="swcs-nav-ai">📸</span>
+            <span class="swcs-nav-ai">🤖</span>
         </a>
 
         <a class="swcs-nav-item" href="{_page_link("news")}" target="_top">
