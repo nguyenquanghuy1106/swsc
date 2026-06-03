@@ -1,0 +1,26 @@
+{
+  "model": "MobileNetV2",
+  "framework": "PyTorch",
+  "input_size": 224,
+  "batch_size": 64,
+  "max_epochs": 20,
+  "actual_epochs": 16,
+  "learning_rate": 0.001,
+  "best_val_accuracy": 0.9153,
+  "test_loss": 0.3129,
+  "test_accuracy": 0.8974,
+  "model_path": "D:\\SWCS\\models\\best_mobilenetv2.pth",
+  "report_dir": "D:\\SWCS\\reports\\model_metrics\\mobilenetv2",
+  "classes": [
+    "battery",
+    "biological",
+    "cardboard",
+    "clothes",
+    "glass",
+    "metal",
+    "paper",
+    "plastic",
+    "shoes",
+    "trash"
+  ]
+}

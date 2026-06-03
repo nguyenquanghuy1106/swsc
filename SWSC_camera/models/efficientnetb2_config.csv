@@ -1,0 +1,19 @@
+﻿Thông số,Giá trị
+Model,EfficientNetB2
+Chức năng sử dụng,Camera AI
+Framework,TensorFlow / Keras
+Input Size,260×260
+Batch Size,24
+Epoch Stage 1,15
+Epoch Fine-tune,12
+Tổng Epoch tối đa,27
+Learning Rate Stage 1,0.0008
+Learning Rate Stage 2,0.000008
+Optimizer,Adam
+Loss Function,CategoricalCrossentropy
+Label Smoothing,0.05
+Transfer Learning,Có
+Pretrained Weight,ImageNet
+Fine-tuning,Có
+Fine-tune Last Layers,80
+Output Model,waste_efficientnet.keras

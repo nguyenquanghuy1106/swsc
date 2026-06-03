@@ -1,0 +1,6 @@
+﻿Metric,Value
+Validation Accuracy,0.9852
+Validation Loss,0.3457
+Macro Precision,0.3314
+Macro Recall,0.3253
+Macro F1-score,0.3283
