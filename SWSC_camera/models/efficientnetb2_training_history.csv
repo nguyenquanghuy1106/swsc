@@ -1,0 +1,28 @@
+﻿Epoch,Giai đoạn,Train Loss,Train Accuracy,Validation Loss,Validation Accuracy
+1,Stage 1 - Head Training,0.8396,0.8057,0.4868,0.9322
+2,Stage 1 - Head Training,0.6612,0.8653,0.443,0.9531
+3,Stage 1 - Head Training,0.6298,0.8786,0.4202,0.9626
+4,Stage 1 - Head Training,0.5984,0.8928,0.4079,0.9679
+5,Stage 1 - Head Training,0.5886,0.8951,0.4184,0.961
+6,Stage 1 - Head Training,0.5749,0.9005,0.4012,0.9708
+7,Stage 1 - Head Training,0.5505,0.91,0.3998,0.9704
+8,Stage 1 - Head Training,0.552,0.9089,0.3982,0.9704
+9,Stage 1 - Head Training,0.5428,0.9143,0.3896,0.9741
+10,Stage 1 - Head Training,0.527,0.9199,0.3983,0.9704
+11,Stage 1 - Head Training,0.5175,0.9245,0.3896,0.9762
+12,Stage 1 - Head Training,0.4963,0.9318,0.3821,0.9774
+13,Stage 1 - Head Training,0.4949,0.936,0.3792,0.9794
+14,Stage 1 - Head Training,0.4892,0.9353,0.3721,0.9803
+15,Stage 1 - Head Training,0.4834,0.9378,0.3715,0.9819
+16,Stage 2 - Fine-tune,0.4699,0.9436,0.3693,0.9807
+17,Stage 2 - Fine-tune,0.4548,0.9489,0.3661,0.9811
+18,Stage 2 - Fine-tune,0.4453,0.952,0.3641,0.9807
+19,Stage 2 - Fine-tune,0.4403,0.9546,0.3593,0.9836
+20,Stage 2 - Fine-tune,0.4368,0.9538,0.3575,0.9831
+21,Stage 2 - Fine-tune,0.4278,0.9609,0.357,0.9831
+22,Stage 2 - Fine-tune,0.4269,0.96,0.3527,0.984
+23,Stage 2 - Fine-tune,0.4211,0.9649,0.3516,0.984
+24,Stage 2 - Fine-tune,0.4174,0.965,0.3511,0.9844
+25,Stage 2 - Fine-tune,0.4113,0.9671,0.3476,0.986
+26,Stage 2 - Fine-tune,0.4106,0.9692,0.3484,0.9848
+27,Stage 2 - Fine-tune,0.4075,0.9688,0.3457,0.9852
